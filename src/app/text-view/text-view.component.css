@@ -1,0 +1,64 @@
+body {
+    height: 200px;
+    width: 50%;
+    border-radius: 5px;
+}
+
+#actions {
+    background: #badfe7;
+    border: 2px solid #021012;
+    padding: 5px;
+    border-radius: 5px;
+    padding-left: 20px;
+}
+
+#actions input {
+    background: white;
+    border: 2px solid #021012;
+    width: 50px;
+    border-radius: 5px;
+}
+
+#actions select {
+    background: white;
+    border: 2px solid #021012;
+    border-radius: 5px;
+    margin: 15px 0;
+    font-size: 14px;
+}
+
+#actions button {
+    background: #6fb3b8;
+    color: black;
+    font-size: 14px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#board {
+    background: #badfe7;
+    border: 2px solid #021012;
+    vertical-align: middle;
+    padding-left: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#team {
+    background: #badfe7;
+    border: 2px solid #021012;
+    vertical-align: middle;
+    padding-left: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#info {
+    background: #badfe7;
+    border: 2px solid #021012;
+    vertical-align: middle;
+    padding-left: 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+}

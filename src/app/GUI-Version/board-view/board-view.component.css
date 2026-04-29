@@ -1,0 +1,7 @@
+#squares {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: hidden;
+    border: 1px solid black;
+}

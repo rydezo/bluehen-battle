@@ -1,0 +1,50 @@
+<div> 
+    <div id="info">  
+        <div id="message">Messages</div>
+    </div>
+    <div id="actions" >
+        <div>
+            <label for="start-row">Start Row:</label>
+            <input type="number" class="location" id="start-row"/>
+            <label for="start-col">Start Col:</label>
+            <input type="number"class="location" id="start-col"/>
+            <br><br>
+            <label for="end-row">End Row: </label>
+            <input type="number" id="end-row" />
+            <label for="end-col">End Col: </label>
+            <input type="number" id="end-col" />
+        </div>
+        <div>
+            <label for="operation-select">Action:</label>
+            <select id="operation-select">
+                <option value="move">Move</option>
+                <option value="attack">Attack</option>
+                <option value="recruit">Recruit</option>        
+                <option value="renew">Renew</option>
+                <option value="revive">Revive</option> 
+                <option value="swap">Swap</option> 
+                <option value="spawn">Spawn</option>
+                <option value="heal">Heal</option>
+                <option value="shield">Shield</option>
+            </select>   
+            <button id="go">Go</button>
+        </div>
+        <br>
+        </div>
+    </div>
+
+    <div id="board">
+        <pre>
+            <div id="game-board">"Game"</div>
+        </pre> 
+    </div>
+
+    <div id="team">
+        <pre>
+            <div id="teams">"Teams"</div>
+        </pre> 
+    </div>
+
+    
+   
+</div>

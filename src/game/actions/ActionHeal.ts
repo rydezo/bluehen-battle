@@ -17,6 +17,7 @@ import { Piece } from "../elements/Piece";
 import { ActionStart } from "./ActionStart";
 // import { PieceBlueHen } from "../elements/PieceBlueHen";
 import { ActionError } from "../ActionError";
+import { PieceMedic } from "../elements/PieceMedic";
 
 
 export class ActionHeal extends ActionStart {
@@ -42,10 +43,19 @@ export class ActionHeal extends ActionStart {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-        
-        const piece: Piece | null = this.game.getGameBoard().getSquare(this.startSquare).getPiece();
+
+        const piece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.startSquare)
+            .getPiece();
+
         if (piece) {
             piece.setActive(true);
+            // NEW ACTION - if the healing piece is a PieceMedic,
+            // increment its heal count which may remove Heal from permAbilities
+            if (piece instanceof PieceMedic) {
+                piece.incrementHealCount();
+            }
             piece.speak();
             this.game.changeTurn();
             return true;

@@ -90,12 +90,21 @@ export class ActionAttack extends ActionStartEnd {
             endPiece.changeSymbol();
             endPiece.setActive(false);
             endPiece.speak();
+
+            // NEW OBJECTIVE - ghost goes dormant, no points awarded yet
         } else {
             // normal attack - remove end piece, move attacker to end square
             this.game.getGameBoard().getSquare(this.endSquare).removePiece();
             if (endPiece) {
                 endPiece.setActive(false);
                 endPiece.speak();
+
+                // NEW OBJECTIVE - award points to current team
+                if (this.game.isTurn(this.game.getCurrentTeam())) {
+                    this.game.addScoreA(endPiece.getPointValue());
+                } else {
+                    this.game.addScoreB(endPiece.getPointValue());
+                }
             }
             const startPiece: Piece | null = this.game
                 .getGameBoard()

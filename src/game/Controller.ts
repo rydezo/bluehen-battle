@@ -106,6 +106,7 @@ import { PieceGhost } from "./elements/PieceGhost";
 import { ActionHeal } from "./actions/ActionHeal";
 import { PieceMedic } from "./elements/PieceMedic";
 import { ActionShield } from "./actions/ActionShield";
+import { GameRO } from "./elements/GameRO";
 
 
 export class Controller {
@@ -122,7 +123,8 @@ export class Controller {
         this.game = this.createGame(rows, cols);
     }
 
-    createGame(rows: number, cols: number): GameS26 {
+    // NEW OBJECTIVE - change return type and instance to GameRO
+    createGame(rows: number, cols: number): GameRO {
         const gameBoard = new GameBoard(rows, cols);
         const teamA = new Team("red", [
             new PieceBlueHen("H", "red", this.createABackpack()),
@@ -136,7 +138,7 @@ export class Controller {
             new PieceGhost("G", "blue", this.createABackpack()),
             new PieceMedic("Md", "blue", this.createABackpack()),
         ]);
-        return new GameS26(gameBoard, teamA, teamB, teamA);
+        return new GameRO(gameBoard, teamA, teamB, teamA);
     }
 
     createABackpack(): Backpack {
@@ -156,8 +158,13 @@ export class Controller {
     getGame(): GameS26 {
         return this.game;
     }
+
+    // NEW OBJECTIVE - update getTurn to also show scores
     getTurn(): string {
-        return `It is ${this.game.getCurrentTeam().getTeamColor()} team's turn.`;
+        return (
+            `It is ${this.game.getCurrentTeam().getTeamColor()} team's turn. ` +
+            `${(this.game as GameRO).getScoreMessage()}`
+        );
     }
 
     carryOutAction(

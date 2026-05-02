@@ -62,6 +62,11 @@ import { Piece } from "./Piece";
 export abstract class Game {
     private status: string;
 
+    // NEW OBJECTIVE - track scores for each team
+    protected scoreA: number = 0;
+    protected scoreB: number = 0;
+    protected readonly WINNING_SCORE: number = 10;
+
     constructor(
         private gameBoard: GameBoard,
         protected teamA: Team,
@@ -120,7 +125,21 @@ export abstract class Game {
     setMessage(message: string): void {
         this.status = message;
     }
-    
+
+    // NEW OBJECTIVE
+    getScoreA(): number {
+        return this.scoreA;
+    }
+    getScoreB(): number {
+        return this.scoreB;
+    }
+    addScoreA(points: number): void {
+        this.scoreA += points;
+    }
+    addScoreB(points: number): void {
+        this.scoreB += points;
+    }
+
     abstract isGameEnded(): boolean;
     abstract getWinner(): Team;
 

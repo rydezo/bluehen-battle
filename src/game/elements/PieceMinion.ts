@@ -81,9 +81,12 @@ export class PieceMinion extends Piece {
         teamColor: string = "NON",
         backpack: Backpack = new Backpack(),
         active: boolean = true) {
-        super(symbol, teamColor, backpack, active);
-        this.permAbilities.push(ActionType.Recruit);
-    }
+            super(symbol, teamColor, backpack, active);
+            this.permAbilities.push(ActionType.Recruit);
+
+            // NEW OBJECTIVE - Minion is worth 1 point
+            this.pointValue = 1;
+        }
 
     getNumRecruits(): number {
         return this.numRecruits;

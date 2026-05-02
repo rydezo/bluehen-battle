@@ -27,6 +27,9 @@ export class PieceMedic extends Piece {
         active: boolean = true,
     ) {
         super(symbol, teamColor, backpack, active);
+
+        // NEW OBJECTIVE - Medic is worth 2 points
+        this.pointValue = 2;
     }
 
     // NEW PIECE - returns how many heals this medic has performed

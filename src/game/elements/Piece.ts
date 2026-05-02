@@ -47,6 +47,10 @@ export abstract class Piece {
     protected permAbilities: ActionType[] = [ActionType.Move];
     protected shielded: boolean = false;
 
+    // NEW OBJECTIVE - each piece has a point value representing
+    // how many points the opposing team earns when this piece is defeated
+    protected pointValue: number = 1;
+
     constructor(
         symbol: string = "X",
         teamColor: string = "NON",
@@ -93,6 +97,11 @@ export abstract class Piece {
     }
     setShielded(shielded: boolean): void {
         this.shielded = shielded;
+    }
+
+    // NEW OBJECTIVE
+    getPointValue(): number {
+        return this.pointValue;
     }
 
     /* For development purposes - all pieces

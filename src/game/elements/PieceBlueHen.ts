@@ -76,6 +76,9 @@ export class PieceBlueHen extends Piece {
     ) {
         super(symbol, teamColor, backpack, active);
         this.permAbilities.push(ActionType.Attack);
+        
+        // NEW OBJECTIVE - BlueHen is worth 3 points
+        this.pointValue = 3;
     }
 
     getNumAttacks(): number {

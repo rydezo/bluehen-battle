@@ -64,6 +64,9 @@ export class PieceGhost extends Piece {
         super(symbol, teamColor, backpack, active);
         this.dormant = dormant;
         this.permAbilities.push(ActionType.Attack);
+
+        // NEW OBJECTIVE - Ghost is worth 2 points
+        this.pointValue = 2;
     }
 
     changeSymbol(): void {

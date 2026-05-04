@@ -59,7 +59,7 @@ Test your PieceBlueHen with PieceBlueHen.test.ts
 */
 
 
-import { ActionType } from "./Utilities";
+import { ActionType, BoardLocation } from "./Utilities";
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
 
@@ -123,5 +123,19 @@ export class PieceBlueHen extends Piece {
         } else {
             super.updateAction(action);
         }
+    }
+
+    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+        if (!super.validPath(startLocation, endLocation)) return false;
+        
+        const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());
+        const colDiff = Math.abs(endLocation.getCol() - startLocation.getCol());
+
+        if (this.canFly) {
+            // ensure spaces are distinct
+            return !(rowDiff === 0 && colDiff === 0);
+        }
+        // one square up/down same column
+        return rowDiff === 0 && colDiff === 1;
     }
 }

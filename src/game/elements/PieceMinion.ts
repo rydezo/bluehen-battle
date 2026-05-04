@@ -69,7 +69,7 @@ Test your PieceMinion with PieceMinion.test.ts
 
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
-import { ActionType, MinionKind } from "./Utilities";
+import { ActionType, BoardLocation, MinionKind } from "./Utilities";
 
 export class PieceMinion extends Piece {
     private typeMinion: MinionKind = MinionKind.Friendly;
@@ -136,5 +136,14 @@ export class PieceMinion extends Piece {
         } else {
             super.updateAction(action);
         }
+    }
+
+    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+        if (!super.validPath(startLocation, endLocation)) return false;
+
+        const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());
+        const colDiff = Math.abs(endLocation.getCol() - startLocation.getCol());
+
+        return rowDiff === 1 && colDiff === 1;
     }
 }

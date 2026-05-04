@@ -47,7 +47,7 @@ method.
 Test your PieceGhost with PieceGhost.test.ts
 */
 
-import { ActionType } from "./Utilities";
+import { ActionType, BoardLocation } from "./Utilities";
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
 
@@ -116,5 +116,14 @@ export class PieceGhost extends Piece {
             return this.backpack.hasUsableAbility(action);
         }
         return super.allowableAction(action);
+    }
+
+    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+        if (!super.validPath(startLocation, endLocation)) return false;
+
+        const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());
+        const colDiff = Math.abs(endLocation.getCol() - startLocation.getCol());
+
+        return (colDiff === 1 || colDiff === 2) && rowDiff === 0;
     }
 }

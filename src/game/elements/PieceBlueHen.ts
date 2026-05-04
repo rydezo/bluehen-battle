@@ -136,6 +136,6 @@ export class PieceBlueHen extends Piece {
             return !(rowDiff === 0 && colDiff === 0);
         }
         // one square up/down same column
-        return rowDiff === 0 && colDiff === 1;
+        return rowDiff === 1 && colDiff === 0;
     }
 }

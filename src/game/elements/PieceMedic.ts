@@ -12,7 +12,7 @@ on its own team. It can move and heal but cannot attack.
 
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
-import { ActionType } from "./Utilities";
+import { ActionType, BoardLocation } from "./Utilities";
 
 export class PieceMedic extends Piece {
     // NEW PIECE
@@ -54,5 +54,15 @@ export class PieceMedic extends Piece {
 
     spawn(): PieceMedic {
         return new PieceMedic(this.symbol, this.teamColor, this.backpack);
+    }
+
+    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+        if (!super.validPath(startLocation, endLocation)) return false;
+
+        const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());
+        const colDiff = Math.abs(endLocation.getCol() - startLocation.getCol());
+
+        // can only move one square up, down, left, or right (no diagonals)
+        return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
     }
 }

@@ -67,6 +67,9 @@ export abstract class Game {
     protected scoreB: number = 0;
     protected readonly WINNING_SCORE: number = 10;
 
+    // ENSURE WINNER - track turn count
+    protected turnCount: number = 0;
+
     constructor(
         private gameBoard: GameBoard,
         protected teamA: Team,
@@ -121,6 +124,7 @@ export abstract class Game {
     }
     changeTurn(): void {
         this.turn = this.getOpponentTeam();
+        this.turnCount++;
     }
     setMessage(message: string): void {
         this.status = message;

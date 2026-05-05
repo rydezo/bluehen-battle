@@ -1,5 +1,5 @@
 /*
-Requirement 5
+Requirements 5 and 7
 NEW OBJECTIVE - GameRO changes the winning condition of the game.
 Instead of simply eliminating all opponent pieces, teams earn points
 when they defeat opponent pieces. Each piece has a point value:
@@ -27,24 +27,35 @@ export class GameRO extends GameS26 {
 
     // NEW OBJECTIVE - game ends when a team hits 10 points
     // OR when a team has no active pieces left
+    // ENSURE WINNER - game ends after 50 turns with no winner
+    // to prevent infinite stalemates
     isGameEnded(): boolean {
+        if (this.turnCount >= 50) return true;
         if (
             this.scoreA >= this.WINNING_SCORE ||
             this.scoreB >= this.WINNING_SCORE
-        ) {
+        )
             return true;
-        }
         return super.isGameEnded();
     }
 
     // NEW OBJECTIVE - winner is determined by points first,
-    // then by active pieces if scores are tied
+    // then by active pieces if scores are tied.
+    // ENSURE WINNER - if scores are tied,
+    // the team with more active pieces wins.
     getWinner(): Team {
         if (this.scoreA > this.scoreB) return this.teamA;
         if (this.scoreB > this.scoreA) return this.teamB;
 
-        // scores are tied - fall back to who has active pieces
-        return super.getWinner();
+        // ENSURE WINNER - tiebreaker: count active pieces
+        const teamAActive = this.teamA.filterPieces(true).length;
+        const teamBActive = this.teamB.filterPieces(true).length;
+        if (teamAActive > teamBActive) return this.teamA;
+        if (teamBActive > teamAActive) return this.teamB;
+
+        // ENSURE WINNER - last resort tiebreaker:
+        // team whose turn it is loses (they couldn't make a move)
+        return this.getOpponentTeam();
     }
 
     // NEW OBJECTIVE - returns a string showing current scores

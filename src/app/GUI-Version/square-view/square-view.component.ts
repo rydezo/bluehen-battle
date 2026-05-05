@@ -15,6 +15,7 @@ import { PieceBlueHen } from "../../../game/elements/PieceBlueHen";
 import { PieceMinion } from "../../../game/elements/PieceMinion";
 import { PieceGhost } from "../../../game/elements/PieceGhost";
 import { Piece } from "../../../game/elements/Piece";
+import { PieceMedic } from "../../../game/elements/PieceMedic";
 
 export class SquareViewComponent extends WebzComponent {
     // Part B - Steps 3-5
@@ -91,6 +92,8 @@ export class SquareViewComponent extends WebzComponent {
                 } else {
                     this.imgName = "ghost.png";
                 }
+            } else if (piece instanceof PieceMedic) {
+                this.imgName = "medic.png";
             }
         }
     }

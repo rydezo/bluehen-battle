@@ -15,7 +15,7 @@ export class MainComponent extends WebzComponent {
 
         // pass true if you want to run the text based input
         // and false if you want to run the gui based
-        this.setUpView(true);
+        this.setUpView(false);
     }
 
     setUpView(isTextInput: boolean) {

@@ -16,6 +16,8 @@ export class ActionViewComponent extends WebzComponent {
     renewNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     reviveNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     stealNotifier: Notifier<ActionType> = new Notifier<ActionType>();
+    healNotifier: Notifier<ActionType> = new Notifier<ActionType>();
+    shieldNotifier: Notifier<ActionType> = new Notifier<ActionType>();
 
     // Notifier array
     private actionNotifiers: Notifier<ActionType>[] = [
@@ -26,6 +28,8 @@ export class ActionViewComponent extends WebzComponent {
         this.swapNotifier,
         this.renewNotifier,
         this.reviveNotifier,
+        this.healNotifier,
+        this.shieldNotifier
     ];
 
     constructor() {
@@ -73,5 +77,17 @@ export class ActionViewComponent extends WebzComponent {
     @Click("revive")
     onRevive() {
         this.reviveNotifier.notify(ActionType.Revive);
+    }
+
+    // New actions
+
+    @Click("heal")
+    onHeal() {
+        this.healNotifier.notify(ActionType.Heal);
+    }
+
+    @Click("shield")
+    onShield() {
+        this.shieldNotifier.notify(ActionType.Shield);
     }
 }

@@ -12,6 +12,7 @@ import { PieceBlueHen } from "../../../game/elements/PieceBlueHen";
 import { PieceMinion } from "../../../game/elements/PieceMinion";
 import { PieceGhost } from "../../../game/elements/PieceGhost";
 import { MinionKind } from "../../../game/elements/Utilities";
+import { PieceMedic } from "../../../game/elements/PieceMedic";
 
 export class PieceViewComponent extends WebzComponent {
     // Part B - Step 21
@@ -60,6 +61,8 @@ export class PieceViewComponent extends WebzComponent {
             } else {
                 this.imgName = "ghost.png";
             }
+        } else if (piece instanceof PieceMedic) {
+            this.imgName = "medic.png";
         }
     }
 }

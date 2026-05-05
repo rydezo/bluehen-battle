@@ -3,5 +3,5 @@
 - [X] Requirement 3
 - [X] Requirement 4
 - [X] Requirement 5
-- [ ] Requirement 6
-- [ ] Requirement 7
+- [X] Requirement 6
+- [X] Requirement 7

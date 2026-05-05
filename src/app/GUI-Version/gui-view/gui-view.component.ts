@@ -26,6 +26,13 @@ export class GuiViewComponent extends WebzComponent {
     // with the view presented to the user
     private controller: Controller = new Controller(4, 5);
 
+    // actions that only need a start square
+    private noEndSquareActions: ActionType[] = [
+        ActionType.Heal,
+        ActionType.Spawn,
+        ActionType.Revive,
+    ];
+
     @BindValue("message")
     private message: string = "Start Game";
 
@@ -81,17 +88,31 @@ export class GuiViewComponent extends WebzComponent {
         if (this.startLocation.getRow() === -1) {
             this.startLocation = location;
             this.selectedSquares =
-                "Start Square: " +
+                "Start: " +
                 this.startLocation.getRow() +
                 ", " +
                 this.startLocation.getCol();
+
+            // if action is already selected and only needs start, go
+            if (
+                this.actionType !== ActionType.Cancel &&
+                this.noEndSquareActions.includes(this.actionType)
+            ) {
+                this.endLocation = new BoardLocation(0, 0);
+                this.carryingOutAction();
+            }
         } else {
             this.endLocation = location;
             this.selectedSquares +=
-                " End Square: " +
+                " End: " +
                 this.endLocation.getRow() +
                 ", " +
                 this.endLocation.getCol();
+
+            // if action is already selected, carry it out
+            if (this.actionType !== ActionType.Cancel) {
+                this.carryingOutAction();
+            }
         }
     }
 
@@ -99,15 +120,30 @@ export class GuiViewComponent extends WebzComponent {
         if (actionType === ActionType.Cancel) {
             this.reset();
             return;
-        } else if (
-            this.startLocation.getRow() === -1 ||
-            this.startLocation.getRow() === -1
-        ) {
-            WebzDialog.popup(this, "Select a location on the board.");
-        } else {
-            this.actionType = actionType;
-            this.carryingOutAction();
         }
+
+        if (this.startLocation.getRow() === -1) {
+            WebzDialog.popup(this, "Select a start location on the board.");
+            return;
+        }
+
+        this.actionType = actionType;
+
+        // if action only needs start square, carry it out immediately
+        // with a dummy end location
+        if (this.noEndSquareActions.includes(actionType)) {
+            this.endLocation = new BoardLocation(0, 0);
+            this.carryingOutAction();
+            return;
+        }
+
+        // otherwise wait for end square to be selected on the board
+        if (this.endLocation.getRow() === -1) {
+            WebzDialog.popup(this, "Now select an end location on the board.");
+            return;
+        }
+
+        this.carryingOutAction();
     }
 
     carryingOutAction() {

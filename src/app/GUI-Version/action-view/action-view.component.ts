@@ -15,7 +15,6 @@ export class ActionViewComponent extends WebzComponent {
     swapNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     renewNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     reviveNotifier: Notifier<ActionType> = new Notifier<ActionType>();
-    stealNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     healNotifier: Notifier<ActionType> = new Notifier<ActionType>();
     shieldNotifier: Notifier<ActionType> = new Notifier<ActionType>();
 

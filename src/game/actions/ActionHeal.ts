@@ -1,12 +1,17 @@
 /*
-ActionHeal represents an action the player can make where the start piece
-can heal itself by setting itself back to active. The start square must have 
-an inactive piece belonging to the current team (because otherwise there's 
-nothing to heal).
+ActionHeal represents an action the player can make where the
+PieceMedic heals the first inactive teammate from the team's piece
+list and places them on a random empty square on the board.
+
+The Medic selects only its own start square - no end square needed.
+The action finds the first inactive teammate automatically.
 
 On a heal:
-- The piece on the start square is set to active
-- The piece speaks
+- The first inactive piece on the current team is found
+- That piece is set to active
+- It is placed on a random empty square on the board
+- The Medic's heal count is incremented
+- The Medic speaks
 - The turn is changed to the other player
 */
 
@@ -19,7 +24,6 @@ import { ActionStart } from "./ActionStart";
 import { ActionError } from "../ActionError";
 import { PieceMedic } from "../elements/PieceMedic";
 
-
 export class ActionHeal extends ActionStart {
     constructor(game: GameS26, startSquare: BoardLocation) {
         super(game, ActionType.Heal, startSquare);
@@ -28,14 +32,30 @@ export class ActionHeal extends ActionStart {
     validAction(): boolean {
         if (!super.validAction()) return false;
 
-        const piece: Piece | null = this.game
-            .getGameBoard()
-            .getSquare(this.startSquare)
-            .getPiece();
-        if (piece && piece.isActive()) {
-            this.game.setMessage("Piece on start square is already active.");
+        // NEW ACTION - check there is room on the board for the revived piece
+        if (this.game.getGameBoard().isBoardFull()) {
+            this.game.setMessage("Board is full, cannot heal.");
             return false;
         }
+
+        // NEW ACTION - check there is actually an inactive teammate to heal
+        const inactivePiece: Piece | undefined = this.game
+            .getCurrentTeam()
+            .filterPieces(false)
+            .find(
+                (p) =>
+                    p !==
+                    this.game
+                        .getGameBoard()
+                        .getSquare(this.startSquare)
+                        .getPiece(),
+            );
+
+        if (!inactivePiece) {
+            this.game.setMessage("No inactive teammates to heal.");
+            return false;
+        }
+
         return true;
     }
 
@@ -44,19 +64,31 @@ export class ActionHeal extends ActionStart {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
 
-        const piece: Piece | null = this.game
+        // NEW ACTION - find the first inactive teammate
+        // (excluding the medic itself which is on the start square)
+        const medic: Piece | null = this.game
             .getGameBoard()
             .getSquare(this.startSquare)
             .getPiece();
 
-        if (piece) {
-            piece.setActive(true);
-            // NEW ACTION - if the healing piece is a PieceMedic,
-            // increment its heal count which may remove Heal from permAbilities
-            if (piece instanceof PieceMedic) {
-                piece.incrementHealCount();
+        const inactivePiece: Piece | undefined = this.game
+            .getCurrentTeam()
+            .filterPieces(false)
+            .find((p) => p !== medic);
+
+        if (inactivePiece) {
+            // NEW ACTION - revive the piece and place on random empty square
+            inactivePiece.setActive(true);
+            const randomSquare = this.game
+                .getGameBoard()
+                .findRandomEmptySquare();
+            randomSquare.setPiece(inactivePiece);
+
+            // NEW ACTION - increment heal count if medic, then speak
+            if (medic instanceof PieceMedic) {
+                medic.incrementHealCount();
             }
-            piece.speak();
+            medic?.speak();
             this.game.changeTurn();
             return true;
         }

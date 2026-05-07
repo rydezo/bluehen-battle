@@ -7,6 +7,11 @@ import { ActionType, BoardLocation } from "../../../game/elements/Utilities";
 import { ActionViewComponent } from "../action-view/action-view.component";
 import { TeamViewComponent } from "../team-view/team-view.component";
 
+// NEW COMPONENTS
+import { ScoreViewComponent } from "../score-view/score-view.component";
+import { PieceInfoComponent } from "../piece-info/piece-info.component";
+import { GameRO } from "../../../game/elements/GameRO";
+
 export class GuiViewComponent extends WebzComponent {
     @BindValue("locations")
     private selectedSquares: string = "";
@@ -35,6 +40,10 @@ export class GuiViewComponent extends WebzComponent {
 
     @BindValue("message")
     private message: string = "Start Game";
+
+    // new fields
+    private scoreView: ScoreViewComponent;
+    private pieceInfo: PieceInfoComponent | null = null;
 
     constructor() {
         super(html, css);
@@ -82,38 +91,60 @@ export class GuiViewComponent extends WebzComponent {
         // Add the Team components to the main component
         this.addComponent(this.teamView1, "team1");
         this.addComponent(this.teamView2, "team2");
+
+        // NEW COMPONENTS
+        // add ScoreViewComponent - static, always present
+        this.scoreView = new ScoreViewComponent(
+            this.controller.getGame() as GameRO,
+        );
+        this.addComponent(this.scoreView, "score-view");
+
+        // listen for win notification from score component
+        this.scoreView.winNotifier.subscribe((winnerColor: string) => {
+            WebzDialog.popup(this, `Game Over! ${winnerColor} team wins!`);
+        });
     }
 
     handleBoardClick(location: BoardLocation) {
-        if (this.startLocation.getRow() === -1) {
-            this.startLocation = location;
-            this.selectedSquares =
-                "Start: " +
-                this.startLocation.getRow() +
-                ", " +
-                this.startLocation.getCol();
+        // dynamically add PieceInfoComponent when square is clicked
+        const square = this.controller
+            .getGame()
+            .getGameBoard()
+            .getSquare(location);
 
-            // if action is already selected and only needs start, go
-            if (
-                this.actionType !== ActionType.Cancel &&
-                this.noEndSquareActions.includes(this.actionType)
-            ) {
-                this.endLocation = new BoardLocation(0, 0);
-                this.carryingOutAction();
-            }
-        } else {
-            this.endLocation = location;
-            this.selectedSquares +=
-                " End: " +
-                this.endLocation.getRow() +
-                ", " +
-                this.endLocation.getCol();
-
-            // if action is already selected, carry it out
-            if (this.actionType !== ActionType.Cancel) {
-                this.carryingOutAction();
-            }
+        // remove old piece info if present
+        if (this.pieceInfo) {
+            this.removeComponent(this.pieceInfo);
         }
+
+        // dynamically create and add new PieceInfoComponent
+        this.pieceInfo = new PieceInfoComponent(square, location);
+        this.addComponent(this.pieceInfo, "piece-info");
+
+        // listen for select notification - sets start or end location
+        this.pieceInfo.selectNotifier.subscribe((loc: BoardLocation) => {
+            if (this.startLocation.getRow() === -1) {
+                this.startLocation = loc;
+                this.selectedSquares =
+                    "Start: " + loc.getRow() + ", " + loc.getCol();
+
+                if (
+                    this.actionType !== ActionType.Cancel &&
+                    this.noEndSquareActions.includes(this.actionType)
+                ) {
+                    this.endLocation = new BoardLocation(0, 0);
+                    this.carryingOutAction();
+                }
+            } else {
+                this.endLocation = loc;
+                this.selectedSquares +=
+                    " End: " + loc.getRow() + ", " + loc.getCol();
+
+                if (this.actionType !== ActionType.Cancel) {
+                    this.carryingOutAction();
+                }
+            }
+        });
     }
 
     handleActionClick(actionType: ActionType) {
@@ -158,13 +189,14 @@ export class GuiViewComponent extends WebzComponent {
             this.teamView1.redraw(this.controller.getGame().getCurrentTeam());
             this.teamView2.redraw(this.controller.getGame().getOpponentTeam());
 
-            // Display whether Game is Over
+            // update score display after every action
+            this.scoreView.update();
+
             if (this.controller.getGame().isGameEnded()) {
                 WebzDialog.popup(
                     this,
-                    "Game Over! Congratulations " +
-                        this.controller.getGame().getWinner() +
-                        "!",
+                    "Game Over! Winner: " +
+                        this.controller.getGame().getWinner().getTeamColor(),
                 );
             } else {
                 this.message =
@@ -179,7 +211,6 @@ export class GuiViewComponent extends WebzComponent {
                 "Invalid Action",
             );
         }
-
         this.reset();
     }
 

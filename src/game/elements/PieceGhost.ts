@@ -1,48 +1,6 @@
 /* Problem 6
-
-6.1 Create a subclass of Piece named PieceGhost that will represent a Ghost.
-This class will inherit members from Piece and additionally include:
-
-- boolean member field to represent whether the Piece is dormant
-
-This field should be added to the constructor parameters, default should 
-be set to false.
-If a ghost is dormant, it's symbol changes to 'D' (or lowercase 'd' if 
-its a spawned piece
-and it can't move or attack until it is revived. The ghost can take other
-actions from it's backpack.
-
-6.2 A constructor with only the parameters required by the superclass 
-     - calls the super class' constructor (symbol should be set to 'G' by default)
-     - adds the ActionType - Attack to its permanent abilities
-
-6.3 An accessor method:
-    - isDormant that returns whether the Piece is dormant
-
-6.4 A private mutator:
-    – changeDormant with one boolean parameter 
-    This method changes the dormant field. If the Ghost is changed
-    to dormant, its symbol changed to 'D' or 'd'. If the Ghost is changed
-    to not dormant, its symbol changes back to 'G' or 'g'.
-    
-6.5 An implementation for the method named speak that has no parameters
-and returns the string 'Boo!'
-
-6.6  Implement the method spawn which will return a copy
-of the Ghost piece (type PieceGhost) with the following properties:
-- symbol - should be the lowercase value of spawning object's symbol
-- teamColor - should match values of spawning object
-- original - should be set to false
-- numSpawns - should be set to 0
-- dormant - should match the spawning object's dormant field
-- the object doing the spawning should have its number of spawns increased by 1
-Note: some of these fields can be set using default values - others cannot
-
-6.7 Override the allowableActions method. If the Ghost is dormant,
-it can only take actions that are available in its backpack. If it is not
-dormant it can take actions as defined in the Piece class' allowable actions
-method.
-------------------------------------------------------
+PieceGhost - a Ghost that goes dormant on first attack instead of being
+removed. Can be revived by ActionRevive.
 
 Test your PieceGhost with PieceGhost.test.ts
 */
@@ -51,9 +9,27 @@ import { ActionType, BoardLocation } from "./Utilities";
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
 
+/**
+ * @description Represents a Ghost piece. Unlike other pieces, when a Ghost
+ * is attacked for the first time it goes dormant instead of being removed.
+ * A dormant Ghost stays on the board but can only use backpack abilities
+ * until revived. Can only move 1 or 2 squares left or right.
+ * Worth 2 points when fully defeated.
+ * NEW OBJECTIVE - pointValue = 2
+ * @extends Piece
+ */
 export class PieceGhost extends Piece {
     private dormant: boolean;
 
+    /**
+     * @description Creates a PieceGhost. Adds Attack to permanent abilities
+     * and sets point value to 2.
+     * @param symbol The symbol for this piece, defaults to "G"
+     * @param teamColor The team color, defaults to "NON"
+     * @param backpack The piece's backpack of abilities
+     * @param active Whether the piece starts active
+     * @param dormant Whether this Ghost starts dormant, defaults to false
+     */
     constructor(
         symbol: string = "G",
         teamColor: string = "NON",
@@ -64,39 +40,53 @@ export class PieceGhost extends Piece {
         super(symbol, teamColor, backpack, active);
         this.dormant = dormant;
         this.permAbilities.push(ActionType.Attack);
-
         // NEW OBJECTIVE - Ghost is worth 2 points
         this.pointValue = 2;
     }
 
+    /**
+     * @description Updates the symbol to reflect the current dormant state.
+     * Dormant originals use "D", dormant spawned use "d".
+     * Active originals use "G", active spawned use "g".
+     */
     changeSymbol(): void {
         if (this.dormant) {
-            if (this.isOriginal()) {
-                this.symbol = "D";
-            } else {
-                this.symbol = "d";
-            }
+            this.symbol = this.isOriginal() ? "D" : "d";
         } else {
-            if (this.isOriginal()) {
-                this.symbol = "G";
-            } else {
-                this.symbol = "g";
-            }
+            this.symbol = this.isOriginal() ? "G" : "g";
         }
     }
 
+    /**
+     * @description Returns whether this Ghost is currently dormant
+     * @returns true if dormant, false if active
+     */
     isDormant(): boolean {
         return this.dormant;
     }
+
+    /**
+     * @description Sets the dormant state and updates the symbol accordingly
+     * @param field true to make dormant, false to revive
+     */
     changeDormant(field: boolean): void {
         this.dormant = field;
         this.changeSymbol();
     }
 
+    /**
+     * @description Returns the Ghost's catchphrase
+     * @returns "Boo!"
+     */
     speak(): string {
         return "Boo!";
     }
 
+    /**
+     * @description Creates a spawned copy of this Ghost with a lowercase
+     * symbol, matching dormant state, and original set to false
+     * @returns A new PieceGhost instance
+     */
     spawn(): PieceGhost {
         const newGhost: PieceGhost = new PieceGhost(
             this.symbol.toLowerCase(),
@@ -111,6 +101,13 @@ export class PieceGhost extends Piece {
         return newGhost;
     }
 
+    /**
+     * @description Overrides allowableAction. A dormant Ghost can only use
+     * abilities from its backpack — its permanent abilities are suspended
+     * until it is revived.
+     * @param action The ActionType to check
+     * @returns true if the action is allowed in the current state
+     */
     allowableAction(action: ActionType): boolean {
         if (this.dormant) {
             return this.backpack.hasUsableAbility(action);
@@ -118,7 +115,17 @@ export class PieceGhost extends Piece {
         return super.allowableAction(action);
     }
 
-    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+    /**
+     * @description Validates the path for this Ghost. Can only move 1 or 2
+     * squares left or right (same row, colDiff of 1 or 2, rowDiff of 0).
+     * @param startLocation The square the piece is moving from
+     * @param endLocation The square the piece is moving to
+     * @returns true if the path is a 1 or 2 square horizontal move
+     */
+    validPath(
+        startLocation: BoardLocation,
+        endLocation: BoardLocation,
+    ): boolean {
         if (!super.validPath(startLocation, endLocation)) return false;
 
         const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());

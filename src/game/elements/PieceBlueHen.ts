@@ -1,73 +1,45 @@
 /* Problem 4
 
-4.1 Create a subclass of Piece named PieceBlueHen that will represent the 
-main UD's Blue Hen Mascot. 
-NOTE: This class is slightly different from the one we developed during lecture.
-This class will inherit members from Piece and additionally include:
-
-- member field to represent the number of attacks its made - default set to 0
-- member field to represent whether it can fly - default set to true
-Neither of these fields should be added to the constructor parameters
-
-4.2 A private constant member named MAX_ATTACKS to represent
-the maximum number of attacks this BlueHen can make before it loses 
-its ability to fly anywhere on the game board. Set this value to 2
-
-4.3 A constructor with only the parameters required by the superclass 
-    (Do not add more parameters to this constructor)
-     - call the super class' constructor (symbol should be set to 'H' by default)
-     - add the ActionType - Attack to its permanent abilities
-     BlueHen pieces will always be able to attack
-
-4.4 An accessor method:
-    - getNumAttacks
-
-4.5 A private mutator:
-    – increaseNumAttacks - increments number of attacks by 1  
-    
-4.6 A PRIVATE method named updateFly that has no
-parameters and no return values. This is the only
-method that can modify (mutate) the member field 'flies'
-It is private and should be called everytime the
-number of attacks is increased. This method will
-check the number of current attacks and if it exceeds
-the MAX_ATTACKS, it cannot fly. Otherwise, it can fly.
-NOTE: After you create this method - call it from 
-inside of increaseNumAttacks.
-
-4.7 An implementation for the method named speak that has no parameters
-and returns the string 'Go UD!'
-
-4.8  Implement the method spawn which will return a copy
-of the BlueHen piece  (type PieceBlueHen) with the following properties:
-- symbol - should be the lowercase value of spawning object's symbol
-- teamColor - should match value of spawning object
-- backpack - should be a clone of the spawning object's backpack
-- original - should be set to false (spawned pieces were not at the start of game)
-- active - should be set to true
-- numAttacks - should be set to match the spawning objects numAttacks
-- numSpawns - should be set to 0
-- flies should be set by the constructor
-The object doing the spawning should have its number of spawns increased by 1
-Note: some of these fields can be set using default values - others cannot
-
-4.9 An override for the updateAction method that:
-calls increaseNumAttacks if the ActionType is Attack
-and calls the super's updateAction otherwise
+4.1 Create a subclass of Piece named PieceBlueHen.
+4.2 MAX_ATTACKS constant = 2
+4.3 Constructor — adds Attack to permAbilities
+4.4 getNumAttacks accessor
+4.5 increaseNumAttacks mutator
+4.6 updateFly private method
+4.7 speak returns 'Go UD!'
+4.8 spawn returns a copy of this BlueHen
+4.9 Override updateAction to call increaseNumAttacks on Attack
 
 Test your PieceBlueHen with PieceBlueHen.test.ts
 */
-
 
 import { ActionType, BoardLocation } from "./Utilities";
 import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
 
+/**
+ * @description Represents the UD Blue Hen mascot piece. The BlueHen can
+ * attack and move, and starts with the ability to fly anywhere on the board.
+ * After exceeding MAX_ATTACKS, it loses its flying ability and can only move
+ * one square up or down. Worth 3 points when defeated.
+ * NEW OBJECTIVE - pointValue = 3
+ * @extends Piece
+ */
 export class PieceBlueHen extends Piece {
     private numAttacks: number = 0;
     private canFly: boolean = true;
+
+    /** @description Maximum attacks before the BlueHen loses flying ability */
     private readonly MAX_ATTACKS: number = 2;
 
+    /**
+     * @description Creates a PieceBlueHen. Adds Attack to permanent abilities
+     * and sets point value to 3.
+     * @param symbol The symbol for this piece, defaults to "H"
+     * @param teamColor The team color, defaults to "NON"
+     * @param backpack The piece's backpack of abilities
+     * @param active Whether the piece starts active
+     */
     constructor(
         symbol: string = "H",
         teamColor: string = "NON",
@@ -76,38 +48,53 @@ export class PieceBlueHen extends Piece {
     ) {
         super(symbol, teamColor, backpack, active);
         this.permAbilities.push(ActionType.Attack);
-        
         // NEW OBJECTIVE - BlueHen is worth 3 points
         this.pointValue = 3;
     }
 
+    /**
+     * @description Returns the number of attacks this BlueHen has made
+     * @returns The attack count
+     */
     getNumAttacks(): number {
         return this.numAttacks;
     }
 
+    /**
+     * @description Increments the attack count and updates fly ability
+     */
     private increaseNumAttacks(): void {
         this.numAttacks += 1;
         this.updateFly();
     }
 
+    /**
+     * @description Updates the canFly field based on numAttacks.
+     * If numAttacks exceeds MAX_ATTACKS, the BlueHen can no longer fly.
+     */
     private updateFly(): void {
-        if (this.numAttacks > this.MAX_ATTACKS) {
-            this.canFly = false;
-        } else {
-            this.canFly = true;
-        }
+        this.canFly = this.numAttacks <= this.MAX_ATTACKS;
     }
 
+    /**
+     * @description Returns the BlueHen's catchphrase
+     * @returns "Go UD!"
+     */
     speak(): string {
         return "Go UD!";
     }
 
+    /**
+     * @description Creates a spawned copy of this BlueHen with a lowercase
+     * symbol, matching team and attack count, and original set to false
+     * @returns A new PieceBlueHen instance
+     */
     spawn(): PieceBlueHen {
-        let newHen: PieceBlueHen = new PieceBlueHen(
+        const newHen: PieceBlueHen = new PieceBlueHen(
             this.symbol.toLowerCase(),
             this.teamColor,
             this.backpack.clone(),
-            true
+            true,
         );
         newHen.original = false;
         newHen.numAttacks = this.numAttacks;
@@ -117,25 +104,40 @@ export class PieceBlueHen extends Piece {
         return newHen;
     }
 
+    /**
+     * @description Overrides updateAction to increment attack count when
+     * the action is an Attack. Delegates to super for all other actions.
+     * @param action The ActionType that was performed
+     */
     updateAction(action: ActionType): void {
-        if (action === "Attack") {
+        if (action === ActionType.Attack) {
             this.increaseNumAttacks();
         } else {
             super.updateAction(action);
         }
     }
 
-    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+    /**
+     * @description Validates the path from start to end for this BlueHen.
+     * If canFly is true, any distinct square is valid. If canFly is false,
+     * only one square up or down (same column) is valid.
+     * @param startLocation The square the piece is moving from
+     * @param endLocation The square the piece is moving to
+     * @returns true if the path is valid for this BlueHen
+     */
+    validPath(
+        startLocation: BoardLocation,
+        endLocation: BoardLocation,
+    ): boolean {
         if (!super.validPath(startLocation, endLocation)) return false;
-        
+
         const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());
         const colDiff = Math.abs(endLocation.getCol() - startLocation.getCol());
 
         if (this.canFly) {
-            // ensure spaces are distinct
             return !(rowDiff === 0 && colDiff === 0);
         }
-        // one square up/down same column
+        // can't fly - one square up or down, same column
         return rowDiff === 1 && colDiff === 0;
     }
 }

@@ -1,81 +1,35 @@
 /*Problem 9: 
 
-9.1 Create a class named GameBoard that will represent 
-the game board.
-Its rows start start at top of the board with row 0
-Its columns start at left side of the board with column 0
-It will contain a 2D array of BoardSquare objects. 
+9.1 Create a class named GameBoard that will represent the game board.
+Its rows start at top of the board with row 0.
+Its columns start at left side of the board with column 0.
+It will contain a 2D array of BoardSquare objects.
 
-This class has the following members:
-
-- member field to represent number of rows on the board
-- member field to represent number of columns on the board
-   (rows start at top of board with row 0 - 
-    columns start at left side of board with column 0)
-- member field to represent all the spaces on the board – 
-    this should be a 2 dimensional array of BoardSquare objects
-- constructor with two parameters in this order:
-    - number of rows
-    - number of columns 
-    - this constructor should set these member fields
-     and set the 2D array member field to an empty array 
-
-9.2 Accessors methods:
-    - getNumRows, getNumColumns, getAllSquares
-
-9.3 Accessor method: 
-    - getSquare that has one parameter of type BoardLocation and returns
-    the BoardSquare at that location's row and column
-
-9.4 A method named inBounds has one parameter of type BoardLocation
-    representing the location of a square on the game board 
-    and returns a boolean value representing whether 
-    the location of this space is within the bounds of the board 
-    (For example:  inBounds( new BoardLocation (3,5)) should return false 
-    for any board with less 4 rows or less than 6 columns)
-
-9.5 A private method named setUpEmptyBoard with no parameters and no return value
-    - This method creates a BoardSquare object for each location 
-    in the 2 dimensional array of BoardSquares.  
-    Use nested loops! You should alternate colors between black and white.
-    You should start the color of the boardsquare at
-    row 0 and col 0 to black and then row 0 col 1 to white.
-    NOTE: after completing this method - add a statement to your 
-    constructor to call this setUpEmptyBoard method
-    After you have done this - see the bottom of the file for code
-    that will create a GameBoard and display the colors so you can
-    debug.
-    HINT: All even rows will start with black and 
-    all odd rows will start with white
-
-9.6 A method named isBoardFull that has no parameters and returns a boolean
-    representing whether there are no empty squares on the board
-    NOTE: This is SIMILAR logic to the Week 2 - In Class Activity function boardFull
-
-9.7 A method named findRandomEmptySquare with no parameters and 
-   returns a BoardSquare. This method should call 
-   getRandomInt() method (already written for you)
-   to generate random row and column indexes
-   if this location on the Board is empty – it should return this BoardSquare,
-   if not, it should repeat the process until it finds an empty space. 
-   NOTE: This is SIMILAR logic to the Week 2 - In Class Activity function
-   placeOnEmptySpot 
-
+9.2 Accessors methods: getNumRows, getNumColumns, getAllSquares
+9.3 Accessor method: getSquare
+9.4 A method named inBounds
+9.5 A private method named setUpEmptyBoard
+9.6 A method named isBoardFull
+9.7 A method named findRandomEmptySquare
 9.8 A method toString is already defined for you
 
 Test your GameBoard classes with GameBoard.test.ts
-
 */
 
 import { BoardSquare } from "./BoardSquare";
 import { BoardLocation } from "./Utilities";
 
+/**
+ * @description Represents the game board as a 2D grid of BoardSquare objects.
+ * Row 0 is the top row, column 0 is the leftmost column. Squares alternate
+ * between black and white starting with black at (0,0).
+ */
 export class GameBoard {
     /**
-     * This function is already defined for you
-     * @param min - minimum integer
-     * @param max - maximum integer
-     * @returns - a random integer between min (inclusive) and max (inclusive)
+     * @description Returns a random integer between min and max inclusive
+     * @param min The minimum value (inclusive)
+     * @param max The maximum value (inclusive)
+     * @returns A random integer in [min, max]
      */
     public static getRandomInt(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -85,6 +39,12 @@ export class GameBoard {
     private numColumns: number;
     private allSquares: BoardSquare[][];
 
+    /**
+     * @description Creates a GameBoard with the given dimensions and
+     * initializes all squares with alternating black/white colors
+     * @param numRows The number of rows on the board
+     * @param numColumns The number of columns on the board
+     */
     constructor(numRows: number, numColumns: number) {
         this.numRows = numRows;
         this.numColumns = numColumns;
@@ -92,52 +52,91 @@ export class GameBoard {
         this.setUpEmptyBoard();
     }
 
+    /**
+     * @description Returns the number of rows on this board
+     * @returns The row count
+     */
     getNumRows(): number {
         return this.numRows;
     }
 
+    /**
+     * @description Returns the number of columns on this board
+     * @returns The column count
+     */
     getNumColumns(): number {
         return this.numColumns;
     }
 
+    /**
+     * @description Returns the full 2D array of BoardSquare objects
+     * @returns The allSquares 2D array
+     */
     getAllSquares(): BoardSquare[][] {
         return this.allSquares;
     }
 
+    /**
+     * @description Returns the BoardSquare at the given board location
+     * @param location The BoardLocation specifying row and column
+     * @returns The BoardSquare at that location
+     */
     getSquare(location: BoardLocation): BoardSquare {
         return this.allSquares[location.getRow()][location.getCol()];
     }
 
+    /**
+     * @description Returns whether the given location falls within the
+     * bounds of this board (row and column both non-negative and within size)
+     * @param location The BoardLocation to check
+     * @returns true if the location is in bounds, false otherwise
+     */
     inBounds(location: BoardLocation): boolean {
         const row = location.getRow();
         const col = location.getCol();
-        return row >= 0 && row < this.numRows && col >= 0 && col < this.numColumns;
+        return (
+            row >= 0 && row < this.numRows && col >= 0 && col < this.numColumns
+        );
     }
 
+    /**
+     * @description Fills the 2D array with BoardSquare objects, alternating
+     * colors. Even rows start with black at column 0; odd rows start with white.
+     */
     private setUpEmptyBoard(): void {
         for (let row = 0; row < this.numRows; row++) {
             this.allSquares[row] = [];
             for (let col = 0; col < this.numColumns; col++) {
-                // Determine color: even rows start with black, odd rows start with white
                 const isEvenRow = row % 2 === 0;
                 const isEvenCol = col % 2 === 0;
-                const color = (isEvenRow && isEvenCol) || (!isEvenRow && !isEvenCol) ? "black" : "white";
+                const color =
+                    (isEvenRow && isEvenCol) || (!isEvenRow && !isEvenCol) ?
+                        "black"
+                    :   "white";
                 this.allSquares[row][col] = new BoardSquare(color);
             }
         }
     }
 
+    /**
+     * @description Returns whether every square on the board has a piece on it
+     * @returns true if no empty squares remain, false otherwise
+     */
     isBoardFull(): boolean {
         for (let row = 0; row < this.numRows; row++) {
             for (let col = 0; col < this.numColumns; col++) {
-                if (this.allSquares[row][col].isEmpty()) {
-                    return false;
-                }
+                if (this.allSquares[row][col].isEmpty()) return false;
             }
         }
         return true;
     }
 
+    /**
+     * @description Finds and returns a random empty square on the board.
+     * Keeps generating random locations until an empty one is found.
+     * Should only be called when the board is not full.
+     * @returns A randomly selected empty BoardSquare
+     */
     findRandomEmptySquare(): BoardSquare {
         let randomSquare = this.allSquares[0][0];
         while (!randomSquare.isEmpty()) {
@@ -148,18 +147,14 @@ export class GameBoard {
         return randomSquare;
     }
 
-
-
-   //
-
     /**
-     * This function is already defined for you
-     * @returns - a string representation of the game board
+     * @description Returns a string representation of the game board showing
+     * all squares and their contents
+     * @returns Formatted multi-line board string
      */
     toString(): string {
         let boardString: string = "";
         boardString = boardString.concat("Col :" + "       ");
-
         for (let col = 0; col < this.getNumColumns(); col++) {
             boardString = boardString.concat(col + "        ");
         }
@@ -177,17 +172,15 @@ export class GameBoard {
     }
 }
 
-   
-/* After you have completed setUpEmptyBoard, you can run this
-code with this command in the terminal to see if your colors
-are getting assigned correctly:
- npx ts-node GameBoard.ts
+/**
+ * @description Returns a string showing the color of every square on the board.
+ * Useful for debugging the board setup.
+ * @param board The GameBoard to display colors for
+ * @returns Formatted multi-line color grid string
  */
-
 export function squareColors(board: GameBoard): string {
     let boardString: string = "";
     boardString = boardString.concat("Col :   ");
-
     for (let col = 0; col < board.getNumColumns(); col++) {
         boardString = boardString.concat(col + "   ");
     }

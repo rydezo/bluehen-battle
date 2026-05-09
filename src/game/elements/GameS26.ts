@@ -1,35 +1,37 @@
 /* Problem 2:
-
-2.1 Define a class named GameS26 that extends Game and 
-represents the game we are developing.
-
-This class should have the following members:
-
-- constructor with the same number of parameters as its
-   superclass. It should:
-   - call the super class constructor
-        
-2.2 Implement isGameEnded method
-    - for our game - the game has ended when either one or both teams
-        has no ACTIVE pieces left on their team
-
-2.3 Implement getWinner method
-    - for our game the winner is the one that still has ACTIVE pieces 
-        left on their team AFTER the game has ended.
-        You can assume it will only be called if the game is ended.
-
-- You can test your class with GameClasses.test.ts
+GameS26 extends Game and implements the base win condition:
+the game ends when either team has no active pieces left.
 */
 
 import { GameBoard } from "./GameBoard";
 import { Team } from "./Team";
 import { Game } from "./Game";
 
+/**
+ * @description Concrete game class implementing the base win condition.
+ * The game ends when either team runs out of active pieces. The winner
+ * is the team that still has active pieces remaining.
+ * Extended by GameRO which adds a point-based win condition.
+ * @extends Game
+ */
 export class GameS26 extends Game {
+    /**
+     * @description Creates a GameS26 with the given board, teams, and turn
+     * @param gameBoard The GameBoard for this game
+     * @param teamA The first team
+     * @param teamB The second team
+     * @param turn The team that goes first
+     */
     constructor(gameBoard: GameBoard, teamA: Team, teamB: Team, turn: Team) {
         super(gameBoard, teamA, teamB, turn);
     }
 
+    /**
+     * @description Returns true if either team has no active pieces remaining.
+     * Checks both teamA and teamB independently so the game ends as soon as
+     * either side is fully eliminated.
+     * @returns true if the game has ended, false if both teams still have active pieces
+     */
     isGameEnded(): boolean {
         let teamAActive: boolean = false;
         let teamBActive: boolean = false;
@@ -42,6 +44,12 @@ export class GameS26 extends Game {
         return !teamAActive || !teamBActive;
     }
 
+    /**
+     * @description Returns the team that still has active pieces. Checks
+     * teamA first, then teamB. Returns a placeholder team with color "N/A"
+     * if neither team has active pieces (a draw — should not normally occur).
+     * @returns The winning Team
+     */
     getWinner(): Team {
         let teamAHasActive: boolean = false;
         for (const piece of this.teamA.getAllPieces()) {

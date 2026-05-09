@@ -1,68 +1,7 @@
 /* Problem 5
-5.1 Create a subclass of Piece named PieceMinion that will represent a 
-minion character from the Despicable Me movie. The Minion Piece will turn
-into an evil minion once it has recruited the MAX_RECRUITS from the other team.
-This class will inherit members from Piece and additionally include:
-
-- member field to represent the kind of minion it is - use an enumerated type
-MinionType from Utilities. The minion will either be friendly (yellow) minion
-    or evil (purple) minion - default value friendly
-- member field to represent the number of recruits its made - default set to 0
-
-Only the kind field should be added to the constructor parameters.
-
-5.2 A private constant member named MAX_RECRUITS to represent
-the number of recruits this minion can make before it turns into 
-an evil minion. (When it turns into an evil minion - it attacks instead of recruits)
-Set this value to 3
-
-5.3 A constructor with the parameters required by the superclass and the kind field 
-     - calls the super class' constructor (symbol should be set to 'M' by default)
-     - adds the ActionType - Recruit to its permanent abilities
-     - kind is set the kind MinionType.Friendly
-
-5.3 Accessor methodd:
-    - getNumRecruits, getKind
-
-5.4 A mutator:
-    – increaseNumRecruits - increments number of recruits by 1 
-   
-5.5 A PRIVATE method named updateKind that has no
-parameters and no return values. This is the only
-method that can modify (mutate) the member field 'kind'.
-It is private and should be called everytime the
-number of recruits is increased. This method will
-check the number of current recruits and if it REACHES
-the MAX_RECRUITS:
-    - it will change the kind to EVIL
-    - its symbol will change to 'E'
-    - it can only permanently move and attack now
-NOTE: After you create this method - call it from 
-inside of increaseRecruits.
-     
-    
-5.6 An implementation for the method named speak that has no parameters
-and returns the string 'Bello!' if they are a friendly minion and 'Grrr!'
-if they are evil.
-
-5.7 An implementation for method named spawn which will return a copy
-of the Minion piece (type PieceMinion) with the following properties:
-- symbol - should be the SAME as value of spawning object's symbol
-- teamColor - should match values of spawning object
-- backpack - should be a clone of the spawning object's backpack
-- original - should be set to false
-- active - should be set to true
-- kind - should match the spawning object's kind
-- numRecruits - should be set to the spawning object's numRecruits
-- numSpawns - should be set to 0
-The object doing the spawning should have its number of spawns increased by 1
-
-Note: some of these fields can be set using default values - others cannot
-
-5.8 An override for the updateAction method that:
-calls increaseNumRecruits if the ActionType is Recruit,
-does nothing if the ActionType is Attack and 
-and calls the super's updateAction otherwise
+PieceMinion - a Minion that can recruit opponents until it turns evil.
+After MAX_RECRUITS recruits, it becomes an evil minion and can only
+move and attack.
 
 Test your PieceMinion with PieceMinion.test.ts
 */
@@ -71,35 +10,70 @@ import { Backpack } from "./Backpack";
 import { Piece } from "./Piece";
 import { ActionType, BoardLocation, MinionKind } from "./Utilities";
 
+/**
+ * @description Represents a Minion piece from Despicable Me. Starts as a
+ * friendly (yellow) minion that can recruit opponents. After recruiting
+ * MAX_RECRUITS times it turns evil (purple), loses recruit ability, and
+ * gains attack. Can only move diagonally one square. Worth 1 point when defeated.
+ * NEW OBJECTIVE - pointValue = 1
+ * @extends Piece
+ */
 export class PieceMinion extends Piece {
     private typeMinion: MinionKind = MinionKind.Friendly;
     private numRecruits: number = 0;
+
+    /** @description Number of recruits before this Minion turns evil */
     private readonly MAX_RECRUITS: number = 3;
 
+    /**
+     * @description Creates a PieceMinion. Adds Recruit to permanent abilities
+     * and sets point value to 1.
+     * @param symbol The symbol for this piece, defaults to "M"
+     * @param teamColor The team color, defaults to "NON"
+     * @param backpack The piece's backpack of abilities
+     * @param active Whether the piece starts active
+     */
     constructor(
         symbol: string = "M",
         teamColor: string = "NON",
         backpack: Backpack = new Backpack(),
-        active: boolean = true) {
-            super(symbol, teamColor, backpack, active);
-            this.permAbilities.push(ActionType.Recruit);
+        active: boolean = true,
+    ) {
+        super(symbol, teamColor, backpack, active);
+        this.permAbilities.push(ActionType.Recruit);
+        // NEW OBJECTIVE - Minion is worth 1 point
+        this.pointValue = 1;
+    }
 
-            // NEW OBJECTIVE - Minion is worth 1 point
-            this.pointValue = 1;
-        }
-
+    /**
+     * @description Returns the number of recruits this Minion has made
+     * @returns The recruit count
+     */
     getNumRecruits(): number {
         return this.numRecruits;
     }
+
+    /**
+     * @description Returns whether this Minion is friendly or evil
+     * @returns The MinionKind enum value
+     */
     getKind(): MinionKind {
         return this.typeMinion;
     }
 
+    /**
+     * @description Increments the recruit count and checks if the Minion
+     * should turn evil
+     */
     increaseNumRecruits(): void {
         this.numRecruits += 1;
         this.updateKind();
     }
 
+    /**
+     * @description Checks if the recruit count has reached MAX_RECRUITS and
+     * if so turns this Minion evil: changes kind, symbol, and permAbilities
+     */
     private updateKind(): void {
         if (this.numRecruits >= this.MAX_RECRUITS) {
             this.typeMinion = MinionKind.Evil;
@@ -108,6 +82,10 @@ export class PieceMinion extends Piece {
         }
     }
 
+    /**
+     * @description Returns the Minion's catchphrase based on its current kind
+     * @returns "Bello!" if friendly, "Grrr!" if evil
+     */
     speak(): string {
         switch (this.typeMinion) {
             case MinionKind.Friendly:
@@ -117,8 +95,18 @@ export class PieceMinion extends Piece {
         }
     }
 
+    /**
+     * @description Creates a spawned copy of this Minion matching its current
+     * kind and recruit count, with original set to false
+     * @returns A new PieceMinion instance
+     */
     spawn(): PieceMinion {
-        const newMinion: PieceMinion = new PieceMinion(this.symbol,this.teamColor,this.backpack.clone(),true);
+        const newMinion: PieceMinion = new PieceMinion(
+            this.symbol,
+            this.teamColor,
+            this.backpack.clone(),
+            true,
+        );
         newMinion.typeMinion = this.typeMinion;
         newMinion.original = false;
         newMinion.numRecruits = this.numRecruits;
@@ -128,7 +116,13 @@ export class PieceMinion extends Piece {
         return newMinion;
     }
 
-    updateAction(action: ActionType) {
+    /**
+     * @description Overrides updateAction to handle Recruit and Attack specially.
+     * Recruit increments the recruit count. Attack does nothing (Minions don't
+     * track attack count). All other actions delegate to super.
+     * @param action The ActionType that was performed
+     */
+    updateAction(action: ActionType): void {
         if (action === ActionType.Recruit) {
             this.increaseNumRecruits();
         } else if (action === ActionType.Attack) {
@@ -138,7 +132,17 @@ export class PieceMinion extends Piece {
         }
     }
 
-    validPath(startLocation: BoardLocation, endLocation: BoardLocation): boolean {
+    /**
+     * @description Validates the path for this Minion. Can only move exactly
+     * one square diagonally (rowDiff === 1 and colDiff === 1).
+     * @param startLocation The square the piece is moving from
+     * @param endLocation The square the piece is moving to
+     * @returns true if the path is a single diagonal step
+     */
+    validPath(
+        startLocation: BoardLocation,
+        endLocation: BoardLocation,
+    ): boolean {
         if (!super.validPath(startLocation, endLocation)) return false;
 
         const rowDiff = Math.abs(endLocation.getRow() - startLocation.getRow());

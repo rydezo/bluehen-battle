@@ -100,11 +100,7 @@ export class ActionAttack extends ActionStartEnd {
                 endPiece.speak();
 
                 // NEW OBJECTIVE - award points to current team
-                if (this.game.isTurn(this.game.getCurrentTeam())) {
-                    this.game.addScoreA(endPiece.getPointValue());
-                } else {
-                    this.game.addScoreB(endPiece.getPointValue());
-                }
+                this.game.addScoreToCurrentTeam(endPiece.getPointValue());
             }
             const startPiece: Piece | null = this.game
                 .getGameBoard()

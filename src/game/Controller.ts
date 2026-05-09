@@ -155,8 +155,8 @@ export class Controller {
         return new Backpack(randomAbilities);
     }
 
-    getGame(): GameS26 {
-        return this.game;
+    getGame(): GameRO {
+        return this.game as GameRO;
     }
 
     // NEW OBJECTIVE - update getTurn to also show scores

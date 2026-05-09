@@ -203,9 +203,3 @@ export function squareColors(board: GameBoard): string {
     }
     return boardString;
 }
-
-let boardEvenCols: GameBoard = new GameBoard(3, 6);
-console.log(squareColors(boardEvenCols));
-
-let boardOddCols: GameBoard = new GameBoard(5, 7);
-console.log(squareColors(boardOddCols));

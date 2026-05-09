@@ -70,7 +70,7 @@ export class ActionRecruit extends ActionStartEnd {
             throw new ActionError(this.game.getMessage(), ActionType.Recruit);
         }
 
-        this.game.getCurrentTeam().removePieceFromTeam(endPiece);
+        this.game.getOpponentTeam().removePieceFromTeam(endPiece);
         this.game.getCurrentTeam().addPieceToTeam(endPiece);
         endPiece.speak();
         startPiece.updateAction(ActionType.Recruit);

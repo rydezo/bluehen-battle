@@ -7,6 +7,12 @@ import { Piece } from "../../../game/elements/Piece";
 import { PieceMedic } from "../../../game/elements/PieceMedic";
 import { BoardSquare } from "../../../game/elements/BoardSquare";
 
+/**
+ * @description Displays information about the piece on a clicked board square.
+ * Notifies the parent component when the player selects this piece's location.
+ * Dynamically added to GuiViewComponent when a square is clicked.
+ * @extends WebzComponent
+ */
 export class PieceInfoComponent extends WebzComponent {
     @BindValue("piece-details")
     private pieceDetails: string = "";
@@ -14,10 +20,17 @@ export class PieceInfoComponent extends WebzComponent {
     @BindValue("backpack-details")
     private backpackDetails: string = "";
 
-    // Notifier fires when player clicks "Select This Piece"
-    // passes the BoardLocation back up to GuiViewComponent
+    /**
+     * @description Notifies parent with the BoardLocation when
+     * the player clicks "Select This Piece"
+     */
     selectNotifier: Notifier<BoardLocation> = new Notifier<BoardLocation>();
 
+    /**
+     * @description Creates a PieceInfoComponent for the given square and location
+     * @param square The BoardSquare that was clicked
+     * @param location The BoardLocation of that square
+     */
     constructor(
         private square: BoardSquare,
         private location: BoardLocation,
@@ -26,6 +39,10 @@ export class PieceInfoComponent extends WebzComponent {
         this.displayInfo();
     }
 
+    /**
+     * @description Builds and displays the piece details and backpack info
+     * for the piece on the given square. Shows "No piece" message if empty.
+     */
     displayInfo() {
         const piece: Piece | null = this.square.getPiece();
 
@@ -65,6 +82,10 @@ export class PieceInfoComponent extends WebzComponent {
         }
     }
 
+    /**
+     * @description Handles "Select This Piece" button click.
+     * Notifies the parent with this piece's board location.
+     */
     @Click("select-btn")
     onSelect() {
         // notify parent with this location

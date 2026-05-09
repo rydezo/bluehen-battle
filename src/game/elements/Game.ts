@@ -143,6 +143,13 @@ export abstract class Game {
     addScoreB(points: number): void {
         this.scoreB += points;
     }
+    addScoreToCurrentTeam(points: number): void {
+        if (this.getCurrentTeam() === this.teamA) {
+            this.scoreA += points;
+        } else {
+            this.scoreB += points;
+        }
+    }
 
     abstract isGameEnded(): boolean;
     abstract getWinner(): Team;

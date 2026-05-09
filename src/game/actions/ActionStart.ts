@@ -37,24 +37,45 @@ import { Piece } from "../elements/Piece";
 import { ActionType } from "../elements/Utilities";
 import { Action } from "./Action";
 
+/**
+ * @description Abstract class representing any action that requires the player
+ * to select a start square. Extends Action with start location validation.
+ * Subclasses that also need an end square should extend ActionStartEnd instead.
+ * @abstract
+ * @extends Action
+ */
 export abstract class ActionStart extends Action {
+    /** @description The board location of the square the player selected as the start */
     protected startSquare: BoardLocation;
-
-    constructor(
-        game: GameS26,
-        actionType: ActionType,
-        startSquare: BoardLocation
-    ) {
+ 
+    /**
+     * @description Creates an ActionStart with a game, action type, and start location
+     * @param game The GameS26 instance this action operates on
+     * @param actionType The type of action being performed
+     * @param startSquare The board location the player selected as the start
+     */
+    constructor(game: GameS26, actionType: ActionType, startSquare: BoardLocation) {
         super(game, actionType);
         this.startSquare = startSquare;
     }
-
+ 
+    /**
+     * @description Validates that the start square meets all requirements:
+     * the location must be in bounds, there must be a piece on the square,
+     * the piece must belong to the current team, and the piece must be
+     * allowed to take this action type.
+     * Sets the game message to an appropriate error string if invalid.
+     * @returns true if all start square requirements are met, false otherwise
+     */
     validAction(): boolean {
         if (!this.game.getGameBoard().inBounds(this.startSquare)) {
             this.game.setMessage("Start square out of bounds.");
             return false;
         }
-        const piece: Piece | null = this.game.getGameBoard().getSquare(this.startSquare).getPiece();
+        const piece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.startSquare)
+            .getPiece();
         if (piece === null) {
             this.game.setMessage("No Piece on start square.");
             return false;
@@ -68,6 +89,5 @@ export abstract class ActionStart extends Action {
             return false;
         }
         return true;
-
     }
 }

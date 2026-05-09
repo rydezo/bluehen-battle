@@ -48,7 +48,20 @@ import { ActionStartEnd } from "./ActionStartEnd";
 import { ActionType } from "../elements/Utilities";
 import { ActionError } from "../ActionError";
 
+/**
+ * @description Represents a move action where the start piece is moved to
+ * an empty end square. The end square must be empty and reachable via a
+ * valid path for the start piece. Changes the turn after a successful move.
+ * @extends ActionStartEnd
+ */
 export class ActionMove extends ActionStartEnd {
+    /**
+     * @description Creates an ActionMove for the given game and locations.
+     * The end square must be empty for a move action.
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the piece to move
+     * @param endSquare The location to move the piece to
+     */
     constructor(
         game: GameS26,
         startSquare: BoardLocation,
@@ -56,23 +69,29 @@ export class ActionMove extends ActionStartEnd {
     ) {
         super(game, ActionType.Move, startSquare, endSquare, true, true);
     }
-
+ 
+    /**
+     * @description Moves the start piece to the end square, calls speak on
+     * the piece, and changes the turn. Throws ActionError if the move is invalid.
+     * @returns true if the move was performed successfully
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-
+ 
         const startSquareObj = this.game
             .getGameBoard()
             .getSquare(this.startSquare);
         const endSquareObj = this.game.getGameBoard().getSquare(this.endSquare);
-
+ 
         const piece: Piece | null = startSquareObj.removePiece();
         if (piece !== null) {
             endSquareObj.setPiece(piece);
             piece.speak();
         }
-
+ 
         this.game.changeTurn();
         return true;
     }

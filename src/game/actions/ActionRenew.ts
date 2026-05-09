@@ -52,7 +52,20 @@ import { ActionStartEnd } from "./ActionStartEnd";
 import { ActionError } from "../ActionError";
 
 
+/**
+ * @description Represents a renew action where the start piece selects a
+ * teammate on the end square and refreshes all abilities in that piece's
+ * backpack, setting them all back to available.
+ * @extends ActionStartEnd
+ */
 export class ActionRenew extends ActionStartEnd {
+    /**
+     * @description Creates an ActionRenew for the given game and locations.
+     * The end square must contain a piece belonging to the current team.
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the piece performing the renew
+     * @param endSquare The location of the teammate whose backpack is renewed
+     */
     constructor(
         game: GameS26,
         startSquare: BoardLocation,
@@ -60,12 +73,19 @@ export class ActionRenew extends ActionStartEnd {
     ) {
         super(game, ActionType.Renew, startSquare, endSquare, false, true);
     }
-
+ 
+    /**
+     * @description Renews all abilities in the end piece's backpack, updates
+     * the start piece's action, calls speak on the end piece, and changes
+     * the turn. Throws ActionError if the action is not valid.
+     * @returns true if the renew was performed successfully
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-
+ 
         const startPiece: Piece | null = this.game
             .getGameBoard()
             .getSquare(this.startSquare)
@@ -74,7 +94,7 @@ export class ActionRenew extends ActionStartEnd {
             .getGameBoard()
             .getSquare(this.endSquare)
             .getPiece();
-
+ 
         if (startPiece && endPiece) {
             endPiece.getBackpack().renew();
             startPiece.updateAction(this.actionType);

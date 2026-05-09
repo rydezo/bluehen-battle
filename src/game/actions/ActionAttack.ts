@@ -56,7 +56,22 @@ import { ActionStartEnd } from "./ActionStartEnd";
 import { PieceGhost } from "../elements/PieceGhost";
 import { ActionError } from "../ActionError";
 
+/**
+ * @description Represents an attack action where the start piece attacks an
+ * opponent's piece on the end square. The attacked piece is set to inactive.
+ * Special case: attacking a non-dormant Ghost makes it go dormant instead of
+ * removing it. A shielded piece will block the attack and consume the shield.
+ * Awards points to the attacking team on a successful attack.
+ * @extends ActionStartEnd
+ */
 export class ActionAttack extends ActionStartEnd {
+    /**
+     * @description Creates an ActionAttack for the given game and locations.
+     * The end square must have an opponent's piece.
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the attacking piece
+     * @param endSquare The location of the piece being attacked
+     */
     constructor(
         game: GameS26,
         startSquare: BoardLocation,
@@ -64,33 +79,40 @@ export class ActionAttack extends ActionStartEnd {
     ) {
         super(game, ActionType.Attack, startSquare, endSquare, false, false);
     }
-
+ 
+    /**
+     * @description Carries out the attack. Handles three cases: shielded target
+     * (attack blocked, shield consumed), dormant ghost target (goes dormant,
+     * attacker stays), and normal attack (piece removed, attacker moves,
+     * points awarded). Changes the turn in all cases.
+     * Throws ActionError if the attack is not valid.
+     * @returns false if the attack was blocked by a shield, true otherwise
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), ActionType.Attack);
         }
-
+ 
         const endPiece: Piece | null = this.game
             .getGameBoard()
             .getSquare(this.endSquare)
             .getPiece();
-
-        // NEW ABILITY OPTION
+ 
+        // NEW ABILITY OPTION - check if the target is shielded
         if (endPiece && endPiece.isShielded()) {
-            // check if the target is shielded
             endPiece.setShielded(false);
             this.game.setMessage("Attack was blocked by a shield!");
             this.game.changeTurn();
             return false;
         }
-
+ 
         if (endPiece instanceof PieceGhost && !endPiece.isDormant()) {
-            // ghost goes dormant stays on board, attacker stays in place
+            // ghost goes dormant, stays on board, attacker stays in place
             endPiece.changeDormant(true);
             endPiece.changeSymbol();
             endPiece.setActive(false);
             endPiece.speak();
-
             // NEW OBJECTIVE - ghost goes dormant, no points awarded yet
         } else {
             // normal attack - remove end piece, move attacker to end square
@@ -98,7 +120,6 @@ export class ActionAttack extends ActionStartEnd {
             if (endPiece) {
                 endPiece.setActive(false);
                 endPiece.speak();
-
                 // NEW OBJECTIVE - award points to current team
                 this.game.addScoreToCurrentTeam(endPiece.getPointValue());
             }
@@ -114,7 +135,7 @@ export class ActionAttack extends ActionStartEnd {
                 startPiece.updateAction(this.actionType);
             }
         }
-
+ 
         this.game.changeTurn();
         return true;
     }

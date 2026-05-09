@@ -59,7 +59,21 @@ import { ActionType } from "../elements/Utilities";
 import { ActionError } from "../ActionError";
 
 
+/**
+ * @description Represents a swap backpack action where the start piece swaps
+ * its backpack with an opponent's piece on the end square. The swap ability
+ * in the start piece's original backpack expires before the swap. The newly
+ * acquired backpack has all its abilities refreshed to available.
+ * @extends ActionStartEnd
+ */
 export class ActionSwapBP extends ActionStartEnd {
+    /**
+     * @description Creates an ActionSwapBP for the given game and locations.
+     * The end square must contain an opponent's piece.
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the piece initiating the swap
+     * @param endSquare The location of the opponent piece to swap with
+     */
     constructor(
         game: GameS26,
         startSquare: BoardLocation,
@@ -67,12 +81,22 @@ export class ActionSwapBP extends ActionStartEnd {
     ) {
         super(game, ActionType.Swap, startSquare, endSquare, false, false);
     }
-
+ 
+    /**
+     * @description Expires the swap ability in the start piece's original
+     * backpack, swaps backpacks between start and end pieces, renews all
+     * abilities in the start piece's newly acquired backpack, calls speak,
+     * and changes the turn. Throws ActionError if the action is not valid.
+     * Note: updateAction must be called BEFORE swapBackpack so the swap
+     * ability expires in the correct (original) backpack.
+     * @returns true if the swap was performed successfully
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-
+ 
         const startPiece: Piece | null = this.game
             .getGameBoard()
             .getSquare(this.startSquare)
@@ -81,8 +105,9 @@ export class ActionSwapBP extends ActionStartEnd {
             .getGameBoard()
             .getSquare(this.endSquare)
             .getPiece();
-
+ 
         if (startPiece && endPiece) {
+            // updateAction before swap so swap ability expires in original backpack
             startPiece.updateAction(this.actionType);
             startPiece.swapBackpack(endPiece);
             startPiece.getBackpack().renew();

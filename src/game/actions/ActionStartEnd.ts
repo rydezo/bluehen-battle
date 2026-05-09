@@ -57,36 +57,76 @@ import { Piece } from "../elements/Piece";
 import { ActionType } from "../elements/Utilities";
 import { ActionStart } from "./ActionStart";
 
+/**
+ * @description Abstract class representing any action that requires both a
+ * start and an end square. Extends ActionStart with end location validation.
+ * Subclasses configure whether the end square should be empty and whether
+ * the piece on the end square should belong to the current or opponent team.
+ * @abstract
+ * @extends ActionStart
+ */
 export abstract class ActionStartEnd extends ActionStart {
+    /** @description The board location the player selected as the end square */
     protected endSquare: BoardLocation;
+ 
+    /** @description Whether the end square must be empty for this action */
     protected endShouldBeEmpty: boolean;
+ 
+    /**
+     * @description Whether the piece on the end square (if required) must
+     * belong to the current team (true) or the opponent team (false)
+     */
     protected shouldBelongToCurrent: boolean = true;
-
+ 
+    /**
+     * @description Creates an ActionStartEnd with all required location and
+     * ownership parameters
+     * @param game The GameS26 instance this action operates on
+     * @param actionType The type of action being performed
+     * @param startSquare The board location the player selected as the start
+     * @param endSquare The board location the player selected as the end
+     * @param endShouldBeEmpty Whether the end square must be empty
+     * @param shouldBelongToCurrent Whether the end piece must belong to current team
+     */
     constructor(
         game: GameS26,
         actionType: ActionType,
         startSquare: BoardLocation,
         endSquare: BoardLocation,
         endShouldBeEmpty: boolean,
-        shouldBelongToCurrent: boolean
+        shouldBelongToCurrent: boolean,
     ) {
         super(game, actionType, startSquare);
         this.endSquare = endSquare;
         this.endShouldBeEmpty = endShouldBeEmpty;
         this.shouldBelongToCurrent = shouldBelongToCurrent;
     }
-
+ 
+    /**
+     * @description Validates all ActionStart requirements plus end square
+     * requirements: end location must be in bounds, the path from start to
+     * end must be valid for the start piece, and the end square must either
+     * be empty or contain the correct team's piece depending on the action.
+     * Sets the game message to an appropriate error string if invalid.
+     * @returns true if all requirements are met, false otherwise
+     */
     validAction(): boolean {
         if (!super.validAction()) return false;
+ 
         if (!this.game.getGameBoard().inBounds(this.endSquare)) {
             this.game.setMessage("End square out of bounds.");
             return false;
         }
-        const startPiece: Piece | null = this.game.getGameBoard().getSquare(this.startSquare).getPiece();
+ 
+        const startPiece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.startSquare)
+            .getPiece();
         if (!startPiece?.validPath(this.startSquare, this.endSquare)) {
             this.game.setMessage("Invalid path for start piece.");
             return false;
         }
+ 
         if (
             this.endShouldBeEmpty &&
             this.game.getGameBoard().getSquare(this.endSquare).getPiece()
@@ -94,20 +134,26 @@ export abstract class ActionStartEnd extends ActionStart {
             this.game.setMessage("End square should be empty.");
             return false;
         }
-
-        const endPiece: Piece | null = this.game.getGameBoard().getSquare(this.endSquare).getPiece();
+ 
+        const endPiece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.endSquare)
+            .getPiece();
+ 
         if (this.endShouldBeEmpty && endPiece !== null) {
             this.game.setMessage("End square should be empty.");
             return false;
         }
-
+ 
         if (!this.endShouldBeEmpty && endPiece === null) {
             this.game.setMessage("No Piece on end square.");
             return false;
         }
-
+ 
         if (!this.endShouldBeEmpty && endPiece !== null) {
-            const endPieceIsCurrent: boolean = endPiece.getTeamColor() === this.game.getCurrentTeam().getTeamColor();
+            const endPieceIsCurrent: boolean =
+                endPiece.getTeamColor() ===
+                this.game.getCurrentTeam().getTeamColor();
             if (this.shouldBelongToCurrent && !endPieceIsCurrent) {
                 this.game.setMessage("Piece on end square is not yours.");
                 return false;

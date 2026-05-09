@@ -60,32 +60,56 @@ import { ActionStart } from "./ActionStart";
 import { ActionError } from "../ActionError";
 
 
+/**
+ * @description Represents a spawn action where the start piece creates a copy
+ * of itself and places it on a random empty square on the board. The spawned
+ * piece is added to the current team. Requires the board to not be full.
+ * @extends ActionStart
+ */
 export class ActionSpawn extends ActionStart {
-    constructor(
-        game: GameS26,
-        startSquare: BoardLocation
-    ) {
+    /**
+     * @description Creates an ActionSpawn for the given game and start location
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the piece that is spawning
+     */
+    constructor(game: GameS26, startSquare: BoardLocation) {
         super(game, ActionType.Spawn, startSquare);
         this.startSquare = startSquare;
     }
-
+ 
+    /**
+     * @description Validates all ActionStart requirements plus checks that
+     * the board is not full (there must be room for the spawned piece)
+     * @returns true if the spawn is valid, false otherwise
+     */
     validAction(): boolean {
-        if (!super.validAction()) {
-            return false;
-        }
-        // Additional requirement for spawn action: check if there is room on the board for a new piece
+        if (!super.validAction()) return false;
+        // board must not be full to place the spawned piece
         return !this.game.getGameBoard().isBoardFull();
     }
-
+ 
+    /**
+     * @description Spawns a copy of the start piece, places it on a random
+     * empty square, adds it to the current team, calls speak, and changes
+     * the turn. Throws ActionError if the action is not valid.
+     * @returns true if the spawn was performed successfully
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-        const startPiece: Piece | null = this.game.getGameBoard().getSquare(this.startSquare).getPiece();
+ 
+        const startPiece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.startSquare)
+            .getPiece();
+ 
         if (startPiece) {
             const spawnedPiece: Piece = startPiece.spawn();
             startPiece.updateAction(this.actionType);
-            const randomEmptySquare: BoardSquare = this.game.getGameBoard().findRandomEmptySquare();
+            const randomEmptySquare: BoardSquare =
+                this.game.getGameBoard().findRandomEmptySquare();
             randomEmptySquare.setPiece(spawnedPiece);
             this.game.getCurrentTeam().addPieceToTeam(spawnedPiece);
             console.log(spawnedPiece.speak());

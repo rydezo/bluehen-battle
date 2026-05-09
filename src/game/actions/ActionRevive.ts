@@ -63,11 +63,28 @@ import { PieceGhost } from "../elements/PieceGhost";
 import { ActionError } from "../ActionError";
 
 
+/**
+ * @description Represents a revive action where the start piece revives all
+ * dormant ghosts belonging to the current team that are still on the board.
+ * Each revived ghost is made active, un-dormanted, and moved to a random
+ * empty square. Requires at least one empty square on the board.
+ * @extends ActionStart
+ */
 export class ActionRevive extends ActionStart {
+    /**
+     * @description Creates an ActionRevive for the given game and start location
+     * @param game The GameS26 instance this action operates on
+     * @param startSquare The location of the piece performing the revive
+     */
     constructor(game: GameS26, startSquare: BoardLocation) {
         super(game, ActionType.Revive, startSquare);
     }
-
+ 
+    /**
+     * @description Validates all ActionStart requirements plus checks that
+     * the board is not full (there must be room to move revived ghosts)
+     * @returns true if the revive is valid, false otherwise
+     */
     validAction(): boolean {
         if (!super.validAction()) return false;
         if (this.game.getGameBoard().isBoardFull()) {
@@ -76,18 +93,41 @@ export class ActionRevive extends ActionStart {
         }
         return true;
     }
-
+ 
+    /**
+     * @description Finds all dormant ghosts on the board belonging to the
+     * current team, revives each one, and moves them to random empty squares.
+     * Updates the start piece's action, calls speak, and changes the turn.
+     * Throws ActionError if the action is not valid.
+     * @returns true if the revive was performed successfully
+     * @throws ActionError if validAction returns false
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), this.actionType);
         }
-
+ 
         const startPiece: Piece | null = this.game
             .getGameBoard()
             .getSquare(this.startSquare)
             .getPiece();
-
-        // Find all dormant ghosts on the board belonging to the current team
+ 
+        this.reviveDormantGhosts();
+ 
+        if (startPiece) {
+            startPiece.updateAction(this.actionType);
+            startPiece.speak();
+        }
+ 
+        this.game.changeTurn();
+        return true;
+    }
+ 
+    /**
+     * @description Finds all dormant ghosts on the board belonging to the
+     * current team and revives each one to a random empty square
+     */
+    private reviveDormantGhosts(): void {
         for (const row of this.game.getGameBoard().getAllSquares()) {
             for (const square of row) {
                 const piece: Piece | null = square.getPiece();
@@ -97,7 +137,6 @@ export class ActionRevive extends ActionStart {
                     piece.getTeamColor() ===
                         this.game.getCurrentTeam().getTeamColor()
                 ) {
-                    // Revive the ghost - no longer dormant, move to random empty square
                     square.removePiece();
                     piece.changeDormant(false);
                     piece.setActive(true);
@@ -109,13 +148,5 @@ export class ActionRevive extends ActionStart {
                 }
             }
         }
-
-        if (startPiece) {
-            startPiece.updateAction(this.actionType);
-            startPiece.speak();
-        }
-
-        this.game.changeTurn();
-        return true;
     }
 }

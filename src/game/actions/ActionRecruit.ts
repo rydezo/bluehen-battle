@@ -54,22 +54,55 @@ import { ActionStartEnd } from "./ActionStartEnd";
 import { ActionError } from "../ActionError";
 
 
+/**
+ * @description Represents a recruit action where the start piece recruits an
+ * opponent's piece on the end square. The recruited piece is removed from the
+ * opponent's team and added to the current team. Both pieces stay on their
+ * current squares and remain active.
+ * @extends ActionStartEnd
+ */
 export class ActionRecruit extends ActionStartEnd {
-    constructor(game: GameS26, startLocation: BoardLocation, endLocation: BoardLocation) {
+    /**
+     * @description Creates an ActionRecruit for the given game and locations.
+     * The end square must contain an opponent's piece.
+     * @param game The GameS26 instance this action operates on
+     * @param startLocation The location of the recruiting piece
+     * @param endLocation The location of the piece being recruited
+     */
+    constructor(
+        game: GameS26,
+        startLocation: BoardLocation,
+        endLocation: BoardLocation,
+    ) {
         super(game, ActionType.Recruit, startLocation, endLocation, false, false);
     }
-
+ 
+    /**
+     * @description Removes the end piece from the opponent's team, adds it to
+     * the current team, calls speak on the recruited piece, updates the
+     * recruiting piece's action, and changes the turn.
+     * Throws ActionError if the action is not valid or pieces are missing.
+     * @returns true if the recruit was performed successfully
+     * @throws ActionError if validAction returns false or pieces are null
+     */
     performAction(): boolean {
         if (!this.validAction()) {
             throw new ActionError(this.game.getMessage(), ActionType.Recruit);
         }
-        const startPiece: Piece | null = this.game.getGameBoard().getSquare(this.startSquare).getPiece();
-        const endPiece: Piece | null = this.game.getGameBoard().getSquare(this.endSquare).getPiece();
-
+ 
+        const startPiece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.startSquare)
+            .getPiece();
+        const endPiece: Piece | null = this.game
+            .getGameBoard()
+            .getSquare(this.endSquare)
+            .getPiece();
+ 
         if (!startPiece || !endPiece) {
             throw new ActionError(this.game.getMessage(), ActionType.Recruit);
         }
-
+ 
         this.game.getOpponentTeam().removePieceFromTeam(endPiece);
         this.game.getCurrentTeam().addPieceToTeam(endPiece);
         endPiece.speak();

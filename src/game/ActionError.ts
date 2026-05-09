@@ -17,12 +17,23 @@ A custom Error class
 
 import { ActionType } from "./elements/Utilities";
 
+/**
+ * @description Custom error class for invalid or failed game actions.
+ * Extends the built-in Error class with an additional actionType field
+ * so callers know which action caused the error.
+ * @extends Error
+ */
 export class ActionError extends Error {
+    /** @description The type of action that caused this error */
     public actionType: ActionType;
-    constructor(
-        message: string,
-        actionType: ActionType
-    ) {
+ 
+    /**
+     * @description Creates an ActionError with a message and the action type
+     * that triggered it
+     * @param message A description of why the action failed
+     * @param actionType The ActionType that was being attempted
+     */
+    constructor(message: string, actionType: ActionType) {
         super(message);
         this.name = "ActionError";
         this.actionType = actionType;

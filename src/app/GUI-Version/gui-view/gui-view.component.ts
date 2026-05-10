@@ -12,39 +12,58 @@ import { ScoreViewComponent } from "../score-view/score-view.component";
 import { PieceInfoComponent } from "../piece-info/piece-info.component";
 import { GameRO } from "../../../game/elements/GameRO";
 
+/**
+ * @description Root GUI component that owns and coordinates all child components.
+ * Manages the Controller, handles board and action clicks, and updates all views
+ * after each action. Orchestrates the full player interaction loop.
+ * @extends WebzComponent
+ */
 export class GuiViewComponent extends WebzComponent {
+    /** @description Displays the currently selected start and end squares */
     @BindValue("locations")
     private selectedSquares: string = "";
 
-    // fields for each component
+    /** @description Displays the current turn or game status message */
+    @BindValue("message")
+    private message: string = "Start Game";
+
     private boardView: BoardViewComponent;
     private teamView1: TeamViewComponent;
     private teamView2: TeamViewComponent;
     private actionView: ActionViewComponent;
+
+    /** @description The action type the player has selected, Cancel by default */
     private actionType: ActionType = ActionType.Cancel;
 
-    // fields for start and end locations selected
+    /** @description The start square location, (-1,-1) means not yet selected */
     private startLocation: BoardLocation = new BoardLocation(-1, -1);
+
+    /** @description The end square location, (-1,-1) means not yet selected */
     private endLocation: BoardLocation = new BoardLocation(-1, -1);
 
-    // the controller will be used to connect our game data
-    // with the view presented to the user
+    /** @description Bridges game logic and the UI */
     private controller: Controller = new Controller(4, 5);
 
-    // actions that only need a start square
+    /**
+     * @description Actions that only require a start square — no end square needed.
+     * When one of these is selected, the action fires immediately after start selection.
+     */
     private noEndSquareActions: ActionType[] = [
         ActionType.Heal,
         ActionType.Spawn,
         ActionType.Revive,
     ];
 
-    @BindValue("message")
-    private message: string = "Start Game";
-
-    // new fields
+    // NEW COMPONENTS
     private scoreView: ScoreViewComponent;
+
+    /** @description Dynamically created when a square is clicked, null otherwise */
     private pieceInfo: PieceInfoComponent | null = null;
 
+    /**
+     * @description Creates the GuiViewComponent, initializes all child components,
+     * and wires up all notifier subscriptions
+     */
     constructor() {
         super(html, css);
 
@@ -105,6 +124,13 @@ export class GuiViewComponent extends WebzComponent {
         });
     }
 
+    /**
+     * @description Handles a click on a board square. Dynamically creates a
+     * PieceInfoComponent for the clicked square, replacing any existing one.
+     * Subscribes to the PieceInfoComponent's selectNotifier to set start or
+     * end location and trigger the action if ready.
+     * @param location The BoardLocation of the clicked square
+     */
     handleBoardClick(location: BoardLocation) {
         // dynamically add PieceInfoComponent when square is clicked
         const square = this.controller
@@ -147,6 +173,12 @@ export class GuiViewComponent extends WebzComponent {
         });
     }
 
+    /**
+     * @description Handles an action button click. Validates that a start
+     * square has been selected, then either fires immediately (for single-square
+     * actions) or prompts the player to select an end square.
+     * @param actionType The ActionType the player selected
+     */
     handleActionClick(actionType: ActionType) {
         if (actionType === ActionType.Cancel) {
             this.reset();
@@ -177,6 +209,12 @@ export class GuiViewComponent extends WebzComponent {
         this.carryingOutAction();
     }
 
+    /**
+     * @description Passes the current action type and locations to the Controller.
+     * On success, redraws the board, team panels, and score display, then checks
+     * for game over. On failure, shows an error dialog with the game's message.
+     * Always resets selection state after attempting the action.
+     */
     carryingOutAction() {
         if (
             this.controller.carryOutAction(
@@ -214,6 +252,10 @@ export class GuiViewComponent extends WebzComponent {
         this.reset();
     }
 
+    /**
+     * @description Resets all selection state — action type, selected squares
+     * display, start location, and end location — back to their defaults
+     */
     reset() {
         this.actionType = ActionType.Cancel;
         this.selectedSquares = "";

@@ -1,0 +1,35 @@
+:host {
+    display: block;
+    font-family: var(--font-sans, sans-serif);
+}
+
+.app-root {
+    min-height: 100vh;
+    background: var(--color-background-tertiary);
+}
+
+.app-header {
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.app-title-main {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.app-title-sub {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}

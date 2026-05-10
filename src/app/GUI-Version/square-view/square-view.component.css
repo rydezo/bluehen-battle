@@ -1,0 +1,29 @@
+:host {
+    display: block;
+}
+
+.square {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: filter 0.1s;
+    box-sizing: border-box;
+}
+
+.square:hover {
+    filter: brightness(1.12);
+}
+
+.square:active {
+    filter: brightness(0.9);
+}
+
+.piece-img {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    box-sizing: border-box;
+    display: block;
+}

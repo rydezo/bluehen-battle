@@ -1,7 +1,14 @@
+:host {
+    display: block;
+}
+
 #squares {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     overflow: hidden;
-    border: 1px solid black;
+    border: 2px solid var(--color-border-primary);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 0 0 4px var(--color-background-secondary);
+    width: fit-content;
 }

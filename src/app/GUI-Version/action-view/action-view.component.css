@@ -1,0 +1,60 @@
+:host {
+    display: block;
+}
+
+.actionbuttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0.75rem 1rem;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+}
+
+.actionbuttons button {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.actionbuttons button:hover {
+    background: var(--color-background-secondary);
+}
+
+.actionbuttons button:active {
+    transform: scale(0.97);
+}
+
+#cancel {
+    color: var(--color-text-danger);
+    border-color: var(--color-border-danger);
+}
+
+#cancel:hover {
+    background: var(--color-background-danger);
+}
+
+#heal {
+    color: var(--color-text-success);
+    border-color: var(--color-border-success);
+}
+
+#heal:hover {
+    background: var(--color-background-success);
+}
+
+#shield {
+    color: var(--color-text-info);
+    border-color: var(--color-border-info);
+}
+
+#shield:hover {
+    background: var(--color-background-info);
+}

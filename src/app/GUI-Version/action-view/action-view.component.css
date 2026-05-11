@@ -2,18 +2,29 @@
     display: block;
 }
 
-.actionbuttons {
+.action-bar {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
-    padding: 0.75rem 1rem;
+    padding: 10px 12px;
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
     border-radius: var(--border-radius-lg);
+    flex-wrap: wrap;
 }
 
-.actionbuttons button {
-    padding: 6px 14px;
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
     font-size: 13px;
     font-weight: 500;
     border-radius: var(--border-radius-md);
@@ -21,40 +32,48 @@
     background: var(--color-background-primary);
     color: var(--color-text-primary);
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+    font-family: var(--font-sans, sans-serif);
 }
 
-.actionbuttons button:hover {
+.btn i {
+    font-size: 15px;
+}
+
+.btn:hover {
     background: var(--color-background-secondary);
+    border-color: var(--color-border-primary);
 }
 
-.actionbuttons button:active {
+.btn:active {
     transform: scale(0.97);
 }
 
-#cancel {
-    color: var(--color-text-danger);
-    border-color: var(--color-border-danger);
-}
-
-#cancel:hover {
-    background: var(--color-background-danger);
-}
-
-#heal {
-    color: var(--color-text-success);
+.btn-heal {
     border-color: var(--color-border-success);
+    color: var(--color-text-success);
 }
 
-#heal:hover {
+.btn-heal:hover {
     background: var(--color-background-success);
 }
 
-#shield {
-    color: var(--color-text-info);
+.btn-shield {
     border-color: var(--color-border-info);
+    color: var(--color-text-info);
 }
 
-#shield:hover {
+.btn-shield:hover {
     background: var(--color-background-info);
+}
+
+.btn-cancel {
+    border-color: var(--color-border-danger);
+    color: var(--color-text-danger);
+    flex-shrink: 0;
+}
+
+.btn-cancel:hover {
+    background: var(--color-background-danger);
 }

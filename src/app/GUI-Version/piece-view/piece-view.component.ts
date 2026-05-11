@@ -14,46 +14,28 @@ import { PieceGhost } from "../../../game/elements/PieceGhost";
 import { MinionKind } from "../../../game/elements/Utilities";
 import { PieceMedic } from "../../../game/elements/PieceMedic";
 
-/**
- * @description Renders a single piece in the team panel. Shows the piece's
- * image with the team color as background, and lists all backpack abilities
- * below the image. Marks inactive pieces with an "Inactive:" prefix.
- * Used by TeamViewComponent to build the full team list.
- * @extends WebzComponent
- */
 export class PieceViewComponent extends WebzComponent {
-    /** @description CSS background color of the piece image (team color) */
+    // Part B - Step 21
     @BindStyle("image", "background")
     private imageBackgroundColor: string = "green";
 
-    /** @description Width and height of the piece image in pixels */
+    // Part B - Step 22
     @BindStyleToNumberAppendPx("image", "width")
     @BindStyleToNumberAppendPx("image", "height")
-    private imageSize: number = 30;
+    private imageSize: number = 48;
 
-    /** @description Padding around the piece image in pixels */
+    // Part B - Step 23
     @BindStyleToNumberAppendPx("image", "padding")
-    private padding: number = 10;
+    private padding: number = 3;
 
-    /**
-     * @description The filename of the piece image.
-     * Transformed to a full path via the BindAttribute callback.
-     */
     @BindAttribute("image", "src", (imgName: string): string => {
         return "assets/images/" + imgName;
     })
     public imgName: string = "blue_hen.png";
 
-    /** @description Displays the piece's backpack abilities as a string */
     @BindValue("abilities")
     private abilities: string = "Abilities: ";
 
-    /**
-     * @description Creates a PieceViewComponent for the given piece.
-     * Sets the image and builds the abilities string, prefixing with
-     * "Inactive:" if the piece is not currently active.
-     * @param piece The Piece to display
-     */
     constructor(piece: Piece) {
         super(html, css);
         this.setImage(piece);
@@ -63,26 +45,23 @@ export class PieceViewComponent extends WebzComponent {
             piece.getBackpack().toString();
     }
 
-    /**
-     * @description Sets the piece image and team color background based on
-     * the piece's type and current state (e.g. dormant ghost, evil minion,
-     * or Medic).
-     * @param piece The Piece whose image should be displayed
-     */
-    setImage(piece: Piece): void {
+    setImage(piece: Piece) {
         this.imageBackgroundColor = piece.getTeamColor();
         if (piece instanceof PieceBlueHen) {
             this.imgName = "bluehen.png";
         } else if (piece instanceof PieceMinion) {
-            this.imgName =
-                piece.getKind() === MinionKind.Evil ?
-                    "evil-minion.png"
-                :   "friendly-minion.png";
+            if ((<PieceMinion>piece).getKind() === MinionKind.Evil) {
+                this.imgName = "evil-minion.png";
+            } else {
+                this.imgName = "friendly-minion.png";
+            }
         } else if (piece instanceof PieceGhost) {
-            this.imgName =
-                piece.isDormant() ? "dormant-ghost.png" : "ghost.png";
+            if ((<PieceGhost>piece).isDormant()) {
+                this.imgName = "dormant-ghost.png";
+            } else {
+                this.imgName = "ghost.png";
+            }
         } else if (piece instanceof PieceMedic) {
-            // NEW PIECE - Medic has its own image
             this.imgName = "medic.png";
         }
     }

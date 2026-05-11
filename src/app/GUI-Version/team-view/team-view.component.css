@@ -2,29 +2,25 @@
     display: block;
 }
 
-.team-panel {
+.team-card {
     background: var(--color-background-primary);
     border: 0.5px solid var(--color-border-tertiary);
     border-radius: var(--border-radius-lg);
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.75rem;
+    padding: 10px 12px;
 }
 
 .team-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
+    gap: 6px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
     border-bottom: 0.5px solid var(--color-border-tertiary);
 }
 
-.team-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
+.team-header i {
+    font-size: 15px;
+    color: var(--color-text-secondary);
 }
 
 .team-label {
@@ -36,14 +32,15 @@
 }
 
 .team-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--color-text-primary);
     text-transform: capitalize;
+    margin-left: auto;
 }
 
 .piece-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }

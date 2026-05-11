@@ -43,18 +43,14 @@ export class ScoreViewComponent extends WebzComponent {
         const scoreA = this.game.getScoreA();
         const scoreB = this.game.getScoreB();
 
-        this.scoreDisplay =
-            `${this.game.getCurrentTeam().getTeamColor()}: ${scoreA} pts  |  ` +
-            `${this.game.getOpponentTeam().getTeamColor()}: ${scoreB} pts  ` +
-            `(First to ${this.WINNING_SCORE} wins)`;
+        // Use getScoreMessage() which reads teamA/teamB directly
+        // NOT getCurrentTeam() which flips every turn and mislabels scores
+        this.scoreDisplay = this.game.getScoreMessage();
 
         this.turnDisplay = `It is ${this.game.getCurrentTeam().getTeamColor()}'s turn.`;
 
-        // notify parent if someone hit the winning score
-        if (scoreA >= this.WINNING_SCORE) {
-            this.winNotifier.notify(this.game.getCurrentTeam().getTeamColor());
-        } else if (scoreB >= this.WINNING_SCORE) {
-            this.winNotifier.notify(this.game.getOpponentTeam().getTeamColor());
+        if (scoreA >= this.WINNING_SCORE || scoreB >= this.WINNING_SCORE) {
+            this.winNotifier.notify(this.game.getWinner().getTeamColor());
         }
     }
 }

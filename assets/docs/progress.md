@@ -1,7 +1,0 @@
-- [X] Requirement 1
-- [X] Requirement 2
-- [X] Requirement 3
-- [X] Requirement 4
-- [X] Requirement 5
-- [X] Requirement 6
-- [X] Requirement 7
